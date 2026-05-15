@@ -1,8 +1,10 @@
 ## SenseCAP T1000-E Telemetry Bot Fork
 
-This repository contains a custom MeshCore BLE companion firmware for the Seeed Studio SenseCAP T1000-E. It adds a direct-message controlled telemetry bot that can send battery, GPS, temperature, and light data into a MeshCore group chat, including Google Maps links and a find-device buzzer command.
+Dies ist eine angepasste MeshCore BLE Companion Firmware fuer den Seeed Studio SenseCAP T1000-E. Sie richtet sich an Nutzer, die MeshCore bereits kennen und den T1000-E zusaetzlich als kleinen Telemetrie-Bot verwenden wollen.
 
-Prebuilt firmware files are in [`firmware/`](./firmware), and the full user/build guide is here: [`docs/t1000e-telemetry-bot.md`](./docs/t1000e-telemetry-bot.md).
+Der Unterschied zur normalen MeshCore T1000-E Companion Firmware: Dieses Build sendet Akku, GPS, Temperatur und Licht automatisch als sichtbare Gruppennachricht, kann per Direktnachricht gestartet/gestoppt und konfiguriert werden, erzeugt Google-Maps-Links und kann per `config wo ist` ein Suchsignal am Geraet abspielen.
+
+Fertige Firmware-Dateien liegen in [`firmware/`](./firmware). Die vollstaendige deutsche Anleitung und der Vergleich zur Original-Firmware stehen hier: [`docs/t1000e-telemetry-bot.md`](./docs/t1000e-telemetry-bot.md).
 
 ---
 
