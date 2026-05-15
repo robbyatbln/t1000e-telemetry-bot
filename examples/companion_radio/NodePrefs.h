@@ -34,4 +34,11 @@ struct NodePrefs {  // persisted to file
   uint8_t autoadd_max_hops;  // 0 = no limit, 1 = direct (0 hops), N = up to N-1 hops (max 64)
   char default_scope_name[31];
   uint8_t default_scope_key[16];
+  uint16_t telemetry_push_interval_mins; // 0=disabled, otherwise send telemetry every N minutes
+  uint8_t telemetry_push_group_idx;      // group/channel index used for periodic telemetry
+  uint8_t telemetry_push_enabled;        // periodic telemetry can be toggled by direct message
+  uint8_t telemetry_push_fields;         // bitmask: battery/gps/temp/light
+  char telemetry_push_group_name[32];    // group/channel name used for periodic telemetry
+  char telemetry_push_label[16];         // first word in outgoing telemetry messages
+  char telemetry_command_prefix[16];     // command prefix, e.g. "config"
 };

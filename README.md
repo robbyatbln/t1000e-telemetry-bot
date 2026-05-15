@@ -1,3 +1,11 @@
+## SenseCAP T1000-E Telemetry Bot Fork
+
+This repository contains a custom MeshCore BLE companion firmware for the Seeed Studio SenseCAP T1000-E. It adds a direct-message controlled telemetry bot that can send battery, GPS, temperature, and light data into a MeshCore group chat, including Google Maps links and a find-device buzzer command.
+
+Prebuilt firmware files are in [`firmware/`](./firmware), and the full user/build guide is here: [`docs/t1000e-telemetry-bot.md`](./docs/t1000e-telemetry-bot.md).
+
+---
+
 ## About MeshCore
 
 MeshCore is a lightweight, portable C++ library that enables multi-hop packet routing for embedded projects using LoRa and other packet radios. It is designed for developers who want to create resilient, decentralized communication networks that work without the internet.

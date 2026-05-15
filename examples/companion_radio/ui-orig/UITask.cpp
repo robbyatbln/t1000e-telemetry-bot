@@ -113,6 +113,25 @@ switch(t){
 //  Serial.println((int) t);
 }
 
+void UITask::setBuzzerQuiet(bool quiet) {
+#ifdef PIN_BUZZER
+  buzzer.quiet(quiet);
+#endif
+}
+
+void UITask::playFindSound() {
+#ifdef PIN_BUZZER
+  bool was_quiet = buzzer.isQuiet();
+  buzzer.quiet(false);
+  buzzer.play("findme:d=8,o=6,b=180:c,e,g,c7,g,e,c,4p,c,e,g,c7,g,e,c");
+  uint32_t started = millis();
+  while (buzzer.isPlaying() && millis() - started < 5000) {
+    buzzer.loop();
+  }
+  buzzer.quiet(was_quiet);
+#endif
+}
+
 void UITask::msgRead(int msgcount) {
   _msgcount = msgcount;
   if (msgcount == 0) {

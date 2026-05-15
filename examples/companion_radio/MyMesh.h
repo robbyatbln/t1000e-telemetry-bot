@@ -194,6 +194,12 @@ private:
 
   void checkCLIRescueCmd();
   void checkSerialInterface();
+  void scheduleTelemetryPush();
+  void checkTelemetryPush();
+  bool sendTelemetryPush();
+  bool sendSelfAdvertZeroHop();
+  bool handleTelemetryControlMessage(const ContactInfo& from, const char* text);
+  void sendTelemetryControlReply(const ContactInfo& to, const char* text);
   bool isValidClientRepeatFreq(uint32_t f) const;
 
   // helpers, short-cuts
@@ -226,6 +232,7 @@ private:
   uint8_t cmd_frame[MAX_FRAME_SIZE + 1];
   uint8_t out_frame[MAX_FRAME_SIZE + 1];
   CayenneLPP telemetry;
+  unsigned long next_telemetry_push;
 
   struct Frame {
     uint8_t len;
