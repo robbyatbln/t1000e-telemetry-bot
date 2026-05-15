@@ -1,0 +1,1711 @@
+
+<!doctype html>
+<html lang="en" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+        <meta name="description" content="Documentation for the open source MeshCore firmware">
+      
+      
+      
+        <link rel="canonical" href="https://meshcore-dev.github.io/meshcore/t1000e-telemetry-bot/">
+      
+      
+        <link rel="prev" href="../stats_binary_frames/">
+      
+      
+        <link rel="next" href="../terminal_chat_cli/">
+      
+      
+        
+      
+      
+      <link rel="icon" href="../assets/images/favicon.png">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.6">
+    
+    
+      
+        <title>SenseCAP T1000-E Telemetry Bot Firmware - MeshCore Docs</title>
+      
+    
+    
+      <link rel="stylesheet" href="../assets/stylesheets/main.484c7ddc.min.css">
+      
+      
+
+
+    
+    
+      
+    
+    
+      
+        
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,300i,400,400i,700,700i%7CRoboto+Mono:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Roboto";--md-code-font:"Roboto Mono"}</style>
+      
+    
+    
+      <link rel="stylesheet" href="../_stylesheets/extra.css">
+    
+    <script>__md_scope=new URL("..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+
+    
+    
+  </head>
+  
+  
+    <body dir="ltr">
+  
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#sensecap-t1000-e-telemetry-bot-firmware" class="md-skip">
+          Skip to content
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+    
+      
+
+  
+
+<header class="md-header md-header--shadow" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="Header">
+    <a href=".." title="MeshCore Docs" class="md-header__button md-logo" aria-label="MeshCore Docs" data-md-component="logo">
+      
+  <img src="../_assets/meshcore.svg" alt="logo">
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            MeshCore Docs
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              SenseCAP T1000-E Telemetry Bot Firmware
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+    
+      <script>var palette=__md_get("__palette");if(palette&&palette.color){if("(prefers-color-scheme)"===palette.color.media){var media=matchMedia("(prefers-color-scheme: light)"),input=document.querySelector(media.matches?"[data-md-color-media='(prefers-color-scheme: light)']":"[data-md-color-media='(prefers-color-scheme: dark)']");palette.color.media=input.getAttribute("data-md-color-media"),palette.color.scheme=input.getAttribute("data-md-color-scheme"),palette.color.primary=input.getAttribute("data-md-color-primary"),palette.color.accent=input.getAttribute("data-md-color-accent")}for(var[key,value]of Object.entries(palette.color))document.body.setAttribute("data-md-color-"+key,value)}</script>
+    
+    
+    
+      
+      
+        <label class="md-header__button md-icon" for="__search">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        </label>
+        <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="Search" placeholder="Search" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="Search">
+        
+        <button type="reset" class="md-search__icon md-icon" title="Clear" aria-label="Clear" tabindex="-1">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+        </button>
+      </nav>
+      
+        <div class="md-search__suggest" data-md-component="search-suggest"></div>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" tabindex="0" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            Initializing search
+          </div>
+          <ol class="md-search-result__list" role="presentation"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+      
+    
+    
+      <div class="md-header__source">
+        <a href="https://github.com/meshcore-dev/meshcore/" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M439.6 236.1 244 40.5c-5.4-5.5-12.8-8.5-20.4-8.5s-15 3-20.4 8.4L162.5 81l51.5 51.5c27.1-9.1 52.7 16.8 43.4 43.7l49.7 49.7c34.2-11.8 61.2 31 35.5 56.7-26.5 26.5-70.2-2.9-56-37.3L240.3 199v121.9c25.3 12.5 22.3 41.8 9.1 55-6.4 6.4-15.2 10.1-24.3 10.1s-17.8-3.6-24.3-10.1c-17.6-17.6-11.1-46.9 11.2-56v-123c-20.8-8.5-24.6-30.7-18.6-45L142.6 101 8.5 235.1C3 240.6 0 247.9 0 255.5s3 15 8.5 20.4l195.6 195.7c5.4 5.4 12.7 8.4 20.4 8.4s15-3 20.4-8.4l194.7-194.7c5.4-5.4 8.4-12.8 8.4-20.4s-3-15-8.4-20.4"/></svg>
+  </div>
+  <div class="md-source__repository">
+    meshcore-dev/meshcore
+  </div>
+</a>
+      </div>
+    
+  </nav>
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+          
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+
+<nav class="md-nav md-nav--primary" aria-label="Navigation" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href=".." title="MeshCore Docs" class="md-nav__button md-logo" aria-label="MeshCore Docs" data-md-component="logo">
+      
+  <img src="../_assets/meshcore.svg" alt="logo">
+
+    </a>
+    MeshCore Docs
+  </label>
+  
+    <div class="md-nav__source">
+      <a href="https://github.com/meshcore-dev/meshcore/" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M439.6 236.1 244 40.5c-5.4-5.5-12.8-8.5-20.4-8.5s-15 3-20.4 8.4L162.5 81l51.5 51.5c27.1-9.1 52.7 16.8 43.4 43.7l49.7 49.7c34.2-11.8 61.2 31 35.5 56.7-26.5 26.5-70.2-2.9-56-37.3L240.3 199v121.9c25.3 12.5 22.3 41.8 9.1 55-6.4 6.4-15.2 10.1-24.3 10.1s-17.8-3.6-24.3-10.1c-17.6-17.6-11.1-46.9 11.2-56v-123c-20.8-8.5-24.6-30.7-18.6-45L142.6 101 8.5 235.1C3 240.6 0 247.9 0 255.5s3 15 8.5 20.4l195.6 195.7c5.4 5.4 12.7 8.4 20.4 8.4s15-3 20.4-8.4l194.7-194.7c5.4-5.4 8.4-12.8 8.4-20.4s-3-15-8.4-20.4"/></svg>
+  </div>
+  <div class="md-source__repository">
+    meshcore-dev/meshcore
+  </div>
+</a>
+    </div>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href=".." class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Introduction
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../cli_commands/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    CLI Commands
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../companion_protocol/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Companion Protocol
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../docs/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Local Documentation
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../faq/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Frequently Asked Questions
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../kiss_modem_protocol/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    MeshCore KISS Modem Protocol
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../nrf52_power_management/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    nRF52 Power Management
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../number_allocations/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Number Allocations
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../packet_format/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Packet Format
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../payloads/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Payload Format
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../qr_codes/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    QR Codes
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../stats_binary_frames/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Stats Binary Frame Structures
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+    
+  
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    SenseCAP T1000-E Telemetry Bot Firmware
+  
+
+    
+  </span>
+  
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    SenseCAP T1000-E Telemetry Bot Firmware
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#deutsche-kurzbeschreibung" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Deutsche Kurzbeschreibung
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#unterschiede-zur-normalen-meshcore-t1000-e-firmware" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Unterschiede zur normalen MeshCore T1000-E Firmware
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#wofuer-ist-diese-firmware-gedacht" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Wofuer ist diese Firmware gedacht?
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#fertige-firmware-dateien" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Fertige Firmware-Dateien
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#flashen" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Flashen
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Flashen">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#variante-a-web-flasher" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Variante A: Web-Flasher
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#variante-b-uf2-per-drag-and-drop" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Variante B: UF2 per Drag-and-Drop
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#standardverhalten" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Standardverhalten
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#befehle-per-direktnachricht" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Befehle per Direktnachricht
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#beispiele" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Beispiele
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#build-aus-dem-quellcode" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Build aus dem Quellcode
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#geaenderte-bereiche" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Geaenderte Bereiche
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#hinweise" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Hinweise
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#english-summary" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        English Summary
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#features" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Features
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#firmware-files" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Firmware Files
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#flashing" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Flashing
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Flashing">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#option-a-web-flasher" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Option A: Web Flasher
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#option-b-uf2-drag-and-drop" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Option B: UF2 Drag-and-Drop
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#default-behavior" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Default Behavior
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#direct-message-commands" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Direct Message Commands
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#example-messages" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Example Messages
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#build-from-source" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Build From Source
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#modified-areas" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Modified Areas
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#notes" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Notes
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../terminal_chat_cli/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Terminal Chat CLI
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#deutsche-kurzbeschreibung" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Deutsche Kurzbeschreibung
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#unterschiede-zur-normalen-meshcore-t1000-e-firmware" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Unterschiede zur normalen MeshCore T1000-E Firmware
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#wofuer-ist-diese-firmware-gedacht" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Wofuer ist diese Firmware gedacht?
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#fertige-firmware-dateien" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Fertige Firmware-Dateien
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#flashen" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Flashen
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Flashen">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#variante-a-web-flasher" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Variante A: Web-Flasher
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#variante-b-uf2-per-drag-and-drop" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Variante B: UF2 per Drag-and-Drop
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#standardverhalten" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Standardverhalten
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#befehle-per-direktnachricht" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Befehle per Direktnachricht
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#beispiele" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Beispiele
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#build-aus-dem-quellcode" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Build aus dem Quellcode
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#geaenderte-bereiche" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Geaenderte Bereiche
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#hinweise" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Hinweise
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#english-summary" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        English Summary
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#features" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Features
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#firmware-files" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Firmware Files
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#flashing" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Flashing
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Flashing">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#option-a-web-flasher" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Option A: Web Flasher
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#option-b-uf2-drag-and-drop" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Option B: UF2 Drag-and-Drop
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#default-behavior" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Default Behavior
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#direct-message-commands" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Direct Message Commands
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#example-messages" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Example Messages
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#build-from-source" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Build From Source
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#modified-areas" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Modified Areas
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#notes" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Notes
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              
+              <article class="md-content__inner md-typeset">
+                
+                  
+
+
+  
+    <a href="https://github.com/meshcore-dev/meshcore/edit/main/docs/t1000e-telemetry-bot.md" title="Edit this page" class="md-content__button md-icon" rel="edit">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M10 20H6V4h7v5h5v3.1l2-2V8l-6-6H6c-1.1 0-2 .9-2 2v16c0 1.1.9 2 2 2h4zm10.2-7c.1 0 .3.1.4.2l1.3 1.3c.2.2.2.6 0 .8l-1 1-2.1-2.1 1-1c.1-.1.2-.2.4-.2m0 3.9L14.1 23H12v-2.1l6.1-6.1z"/></svg>
+    </a>
+  
+  
+
+
+<h1 id="sensecap-t1000-e-telemetry-bot-firmware">SenseCAP T1000-E Telemetry Bot Firmware</h1>
+<h2 id="deutsche-kurzbeschreibung">Deutsche Kurzbeschreibung</h2>
+<p>Diese Firmware ist eine angepasste MeshCore BLE Companion Firmware fuer den Seeed Studio SenseCAP T1000-E. Sie ist fuer Leute gedacht, die MeshCore bereits nutzen und den T1000-E als automatischen Telemetrie-Sender in einer MeshCore-Gruppe betreiben wollen.</p>
+<p>Die Firmware bleibt grundsaetzlich eine normale MeshCore Companion Firmware: Verbindung per Android/iOS/Web-App, Gruppen, Kontakte, Region und normale Nachrichten funktionieren weiterhin wie gewohnt. Zusaetzlich gibt es einen Telemetrie-Bot, der per Direktnachricht gesteuert wird.</p>
+<h2 id="unterschiede-zur-normalen-meshcore-t1000-e-firmware">Unterschiede zur normalen MeshCore T1000-E Firmware</h2>
+<table>
+<thead>
+<tr>
+<th>Bereich</th>
+<th>Normale MeshCore T1000-E Companion Firmware</th>
+<th>Diese Telemetry-Bot Firmware</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Telemetrie</td>
+<td>Telemetrie kann abgefragt werden, wird aber nicht automatisch als Chattext in eine Gruppe geschrieben.</td>
+<td>Sendet Akku, GPS, Temperatur und Licht automatisch als sichtbare Gruppennachricht.</td>
+</tr>
+<tr>
+<td>Steuerung</td>
+<td>Einstellungen hauptsaechlich ueber App/Companion-Protokoll.</td>
+<td>Start, Stop, Status und Konfiguration per Direktnachricht, z. B. <code>config start</code>.</td>
+</tr>
+<tr>
+<td>Zielgruppe</td>
+<td>Keine feste automatische Telemetrie-Zielgruppe.</td>
+<td>Zielgruppe per Name konfigurierbar, z. B. <code>config group Robbys_channel</code>.</td>
+</tr>
+<tr>
+<td>Nachrichtentext</td>
+<td>Keine automatische Chat-Nachricht mit Sensorwerten.</td>
+<td>Erstes Wort/Label konfigurierbar, z. B. <code>config label tracker</code>.</td>
+</tr>
+<tr>
+<td>GPS</td>
+<td>Positionsdaten koennen im MeshCore-Kontext genutzt werden.</td>
+<td>GPS wird optional als Google-Maps-Link in die Gruppennachricht geschrieben.</td>
+</tr>
+<tr>
+<td>Intervall</td>
+<td>Kein automatischer 5-Minuten-Gruppenpush.</td>
+<td>Intervall per Direktnachricht einstellbar, z. B. <code>config interval 5</code>.</td>
+</tr>
+<tr>
+<td>Felder</td>
+<td>Keine Chat-Auswahl per Textbefehl.</td>
+<td>Felder per Direktnachricht waehlbar: <code>gps</code>, <code>akku</code>, <code>temp</code>, <code>licht</code>, <code>all</code>.</td>
+</tr>
+<tr>
+<td>Quittung</td>
+<td>Keine Bot-artige Rueckmeldung auf solche Befehle.</td>
+<td>Jeder erkannte Befehl wird per Direktnachricht bestaetigt.</td>
+</tr>
+<tr>
+<td>Suchton</td>
+<td>Standard-Buzzer-Sounds je nach UI/Build.</td>
+<td><code>config wo ist</code> spielt ein Suchsignal am Geraet.</td>
+</tr>
+<tr>
+<td>Tonsteuerung</td>
+<td>Buzzer kann lokal/UI-abhaengig gesteuert werden.</td>
+<td><code>config sound off</code> und <code>config sound on</code> per Direktnachricht.</td>
+</tr>
+</tbody>
+</table>
+<h2 id="wofuer-ist-diese-firmware-gedacht">Wofuer ist diese Firmware gedacht?</h2>
+<ul>
+<li>T1000-E am Rucksack, Fahrrad, Auto, Werkzeugkoffer oder an einer mobilen Station.</li>
+<li>Regelmaessige Statusmeldung in eine MeshCore-Gruppe.</li>
+<li>Schnelles Wiederfinden in der Naehe per <code>config wo ist</code>.</li>
+<li>Einfache Fernsteuerung ohne neue Android-App und ohne Custom-Var-Menue.</li>
+</ul>
+<h2 id="fertige-firmware-dateien">Fertige Firmware-Dateien</h2>
+<p>Im Ordner <code>firmware/</code> liegen zwei Dateien:</p>
+<ul>
+<li><code>t1000e_companion_radio_ble-telemetry-bot.zip</code> fuer den MeshCore/Web nRF Flasher.</li>
+<li><code>t1000e_companion_radio_ble-telemetry-bot.uf2</code> fuer Drag-and-Drop im DFU-Laufwerk.</li>
+</ul>
+<p>Wichtig: Im Web-Flasher die ZIP-Datei verwenden. Die UF2-Datei nur direkt auf das DFU-Laufwerk kopieren.</p>
+<h2 id="flashen">Flashen</h2>
+<h3 id="variante-a-web-flasher">Variante A: Web-Flasher</h3>
+<ol>
+<li>T1000-E in den DFU/Bootloader-Modus bringen.</li>
+<li>MeshCore/Web-Flasher oeffnen.</li>
+<li>Als Custom Firmware die Datei <code>firmware/t1000e_companion_radio_ble-telemetry-bot.zip</code> auswaehlen.</li>
+<li>Flashen und den Neustart abwarten.</li>
+</ol>
+<h3 id="variante-b-uf2-per-drag-and-drop">Variante B: UF2 per Drag-and-Drop</h3>
+<ol>
+<li>T1000-E in den DFU/Bootloader-Modus bringen.</li>
+<li>Warten, bis das T1000-E-Laufwerk erscheint.</li>
+<li><code>firmware/t1000e_companion_radio_ble-telemetry-bot.uf2</code> auf dieses Laufwerk kopieren.</li>
+<li>Neustart abwarten.</li>
+</ol>
+<h2 id="standardverhalten">Standardverhalten</h2>
+<p>Im aktuellen Build sind diese Defaults gesetzt:</p>
+<ul>
+<li>Zielgruppe: <code>Robbys_channel</code></li>
+<li>Intervall: 5 Minuten</li>
+<li>Befehlswort: <code>config</code></li>
+<li>Nachrichten-Label: <code>Telemetry</code></li>
+<li>Felder: Akku, GPS, Temperatur, Licht</li>
+</ul>
+<p>Die Zielgruppe muss auf dem Geraet existieren und exakt gleich geschrieben sein.</p>
+<h2 id="befehle-per-direktnachricht">Befehle per Direktnachricht</h2>
+<p>Alle Befehle werden als Direktnachricht an den T1000-E gesendet. Jeder erkannte Befehl wird ebenfalls per Direktnachricht bestaetigt.</p>
+<table>
+<thead>
+<tr>
+<th>Befehl</th>
+<th>Wirkung</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>config help</code></td>
+<td>Gibt eine kurze Befehlsuebersicht zurueck.</td>
+</tr>
+<tr>
+<td><code>config status</code></td>
+<td>Gibt aktuelle Einstellungen zurueck.</td>
+</tr>
+<tr>
+<td><code>config start</code></td>
+<td>Startet den periodischen Versand. Erste Meldung nach ca. 3 Sekunden.</td>
+</tr>
+<tr>
+<td><code>config stop</code></td>
+<td>Stoppt den periodischen Versand.</td>
+</tr>
+<tr>
+<td><code>config group Robbys_channel</code></td>
+<td>Setzt die Zielgruppe.</td>
+</tr>
+<tr>
+<td><code>config interval 5</code></td>
+<td>Setzt das Intervall in Minuten.</td>
+</tr>
+<tr>
+<td><code>config label test</code></td>
+<td>Setzt das erste Wort der Gruppennachricht, z. B. <code>test:</code>.</td>
+</tr>
+<tr>
+<td><code>config all</code></td>
+<td>Aktiviert alle Felder.</td>
+</tr>
+<tr>
+<td><code>config gps akku temp licht</code></td>
+<td>Aktiviert genau diese Felder.</td>
+</tr>
+<tr>
+<td><code>config sound off</code></td>
+<td>Deaktiviert normale Tonsignale.</td>
+</tr>
+<tr>
+<td><code>config sound on</code></td>
+<td>Aktiviert normale Tonsignale.</td>
+</tr>
+<tr>
+<td><code>config wo ist</code></td>
+<td>Spielt ein Suchsignal am Geraet ab.</td>
+</tr>
+<tr>
+<td><code>config prefix xy</code></td>
+<td>Aendert das Befehlswort von <code>config</code> auf <code>xy</code>.</td>
+</tr>
+</tbody>
+</table>
+<p>Nach <code>config prefix xy</code> muessen weitere Befehle mit <code>xy</code> beginnen:</p>
+<pre><code class="language-text">xy help
+xy status
+xy stop
+xy label tracker
+</code></pre>
+<h2 id="beispiele">Beispiele</h2>
+<p>Standardmeldung:</p>
+<pre><code class="language-text">Telemetry: Akku 3.95V Temp 24.1C Licht 42% GPS https://maps.google.com/?q=52.123456,13.123456
+</code></pre>
+<p>Label und Felder aendern:</p>
+<pre><code class="language-text">config label test
+config gps akku
+</code></pre>
+<p>Danach sendet die Gruppe z. B.:</p>
+<pre><code class="language-text">test: Akku 3.95V GPS https://maps.google.com/?q=52.123456,13.123456
+</code></pre>
+<p>Geraet stumm schalten, aber trotzdem finden:</p>
+<pre><code class="language-text">config sound off
+config wo ist
+</code></pre>
+<h2 id="build-aus-dem-quellcode">Build aus dem Quellcode</h2>
+<p>PlatformIO installieren und dann das T1000-E BLE Companion Target bauen:</p>
+<pre><code class="language-powershell">$env:PLATFORMIO_CORE_DIR='X:\.platformio'
+python -m platformio run -e t1000e_companion_radio_ble
+</code></pre>
+<p>Unter Windows ist ein kurzer Pfad empfehlenswert, weil die nRF52-Toolchain sonst Pfadlaengenprobleme bekommen kann:</p>
+<pre><code class="language-powershell">subst X: 'C:\path\to\workspace'
+cd X:\MeshCore
+$env:PLATFORMIO_CORE_DIR='X:\.platformio'
+python -m platformio run -e t1000e_companion_radio_ble
+</code></pre>
+<p>UF2 erzeugen:</p>
+<pre><code class="language-powershell">python bin\uf2conv\uf2conv.py .pio\build\t1000e_companion_radio_ble\firmware.hex -c -o .pio\build\t1000e_companion_radio_ble\firmware.uf2 -f 0xADA52840
+</code></pre>
+<h2 id="geaenderte-bereiche">Geaenderte Bereiche</h2>
+<ul>
+<li><code>examples/companion_radio/MyMesh.cpp</code></li>
+<li><code>examples/companion_radio/MyMesh.h</code></li>
+<li><code>examples/companion_radio/NodePrefs.h</code></li>
+<li><code>examples/companion_radio/DataStore.cpp</code></li>
+<li><code>examples/companion_radio/AbstractUITask.h</code></li>
+<li><code>examples/companion_radio/ui-orig/UITask.cpp</code></li>
+<li><code>examples/companion_radio/ui-orig/UITask.h</code></li>
+<li><code>variants/t1000-e/platformio.ini</code></li>
+</ul>
+<h2 id="hinweise">Hinweise</h2>
+<ul>
+<li>Dies ist ein Custom-Fork, keine offizielle MeshCore-Release.</li>
+<li>Nur auf dem Seeed Studio SenseCAP T1000-E verwenden.</li>
+<li>Gruppennamen sind case-sensitive.</li>
+<li>GPS ist erst sinnvoll, wenn das Geraet einen Fix hat.</li>
+<li><code>config wo ist</code> ist zum Finden in der Naehe gedacht, nicht als Apple-Find-My-Ersatz.</li>
+</ul>
+<hr />
+<h2 id="english-summary">English Summary</h2>
+<p>This fork adds a telemetry bot mode to the MeshCore BLE companion firmware for the Seeed Studio SenseCAP T1000-E.</p>
+<p>The firmware periodically sends visible group chat messages with selected telemetry fields and can be controlled by direct messages.</p>
+<h2 id="features">Features</h2>
+<ul>
+<li>Periodic telemetry messages to a configurable MeshCore group.</li>
+<li>Direct-message control with acknowledgements.</li>
+<li>Configurable message label, group name, interval, and telemetry fields.</li>
+<li>Google Maps links for GPS coordinates.</li>
+<li>Optional zero-hop advert after each telemetry push.</li>
+<li>Buzzer mute/unmute by direct message.</li>
+<li>Find-device sound by direct message.</li>
+</ul>
+<h2 id="firmware-files">Firmware Files</h2>
+<p>Prebuilt firmware artifacts are in the <code>firmware/</code> folder:</p>
+<ul>
+<li><code>t1000e_companion_radio_ble-telemetry-bot.zip</code> for the MeshCore/Web nRF flasher.</li>
+<li><code>t1000e_companion_radio_ble-telemetry-bot.uf2</code> for drag-and-drop flashing in DFU mode.</li>
+</ul>
+<p>Use the ZIP with web flashing. Use the UF2 only when the T1000-E appears as a DFU mass-storage drive.</p>
+<h2 id="flashing">Flashing</h2>
+<h3 id="option-a-web-flasher">Option A: Web Flasher</h3>
+<ol>
+<li>Put the T1000-E into DFU/bootloader mode.</li>
+<li>Open the MeshCore flasher.</li>
+<li>Choose the custom firmware ZIP from <code>firmware/t1000e_companion_radio_ble-telemetry-bot.zip</code>.</li>
+<li>Flash and wait until the device reboots.</li>
+</ol>
+<h3 id="option-b-uf2-drag-and-drop">Option B: UF2 Drag-and-Drop</h3>
+<ol>
+<li>Put the T1000-E into DFU/bootloader mode.</li>
+<li>Wait until the T1000-E DFU drive appears.</li>
+<li>Copy <code>firmware/t1000e_companion_radio_ble-telemetry-bot.uf2</code> onto that drive.</li>
+<li>Wait for the device to reboot.</li>
+</ol>
+<h2 id="default-behavior">Default Behavior</h2>
+<p>Default build settings for the T1000-E BLE companion target:</p>
+<ul>
+<li>Target group: <code>Robbys_channel</code></li>
+<li>Interval: 5 minutes</li>
+<li>Command prefix: <code>config</code></li>
+<li>Message label: <code>Telemetry</code></li>
+<li>Fields: battery, GPS, temperature, light</li>
+</ul>
+<p>The group must exist on the device and the group name must match exactly.</p>
+<h2 id="direct-message-commands">Direct Message Commands</h2>
+<p>Send these as direct messages to the T1000-E node.</p>
+<table>
+<thead>
+<tr>
+<th>Command</th>
+<th>Effect</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>config help</code></td>
+<td>Sends a short command list as a direct reply.</td>
+</tr>
+<tr>
+<td><code>config status</code></td>
+<td>Sends current settings as a direct reply.</td>
+</tr>
+<tr>
+<td><code>config start</code></td>
+<td>Enables periodic telemetry. First message is sent after about 3 seconds.</td>
+</tr>
+<tr>
+<td><code>config stop</code></td>
+<td>Disables periodic telemetry.</td>
+</tr>
+<tr>
+<td><code>config group Robbys_channel</code></td>
+<td>Sets the target group by name.</td>
+</tr>
+<tr>
+<td><code>config interval 5</code></td>
+<td>Sets the interval in minutes. Use <code>0</code> to disable timer scheduling.</td>
+</tr>
+<tr>
+<td><code>config label test</code></td>
+<td>Sets the first word of every outgoing telemetry message.</td>
+</tr>
+<tr>
+<td><code>config all</code></td>
+<td>Enables all telemetry fields.</td>
+</tr>
+<tr>
+<td><code>config gps akku temp licht</code></td>
+<td>Selects GPS, battery, temperature, and light fields.</td>
+</tr>
+<tr>
+<td><code>config sound off</code></td>
+<td>Mutes normal buzzer notifications.</td>
+</tr>
+<tr>
+<td><code>config sound on</code></td>
+<td>Enables normal buzzer notifications.</td>
+</tr>
+<tr>
+<td><code>config wo ist</code></td>
+<td>Plays a find-device sound even if normal sound is muted.</td>
+</tr>
+<tr>
+<td><code>config prefix xy</code></td>
+<td>Changes the command prefix from <code>config</code> to <code>xy</code>.</td>
+</tr>
+</tbody>
+</table>
+<p>After changing the prefix, commands must use the new prefix, for example:</p>
+<pre><code class="language-text">xy help
+xy stop
+xy label tracker
+</code></pre>
+<h2 id="example-messages">Example Messages</h2>
+<p>With default settings:</p>
+<pre><code class="language-text">Telemetry: Akku 3.95V Temp 24.1C Licht 42% GPS https://maps.google.com/?q=52.123456,13.123456
+</code></pre>
+<p>After:</p>
+<pre><code class="language-text">config label test
+config gps akku
+</code></pre>
+<p>The group message becomes:</p>
+<pre><code class="language-text">test: Akku 3.95V GPS https://maps.google.com/?q=52.123456,13.123456
+</code></pre>
+<h2 id="build-from-source">Build From Source</h2>
+<p>Install PlatformIO, then build the T1000-E BLE companion target:</p>
+<pre><code class="language-powershell">$env:PLATFORMIO_CORE_DIR='X:\.platformio'
+python -m platformio run -e t1000e_companion_radio_ble
+</code></pre>
+<p>On Windows, a short workspace path is recommended because the nRF52 ARM toolchain can hit path-length issues. One workaround is:</p>
+<pre><code class="language-powershell">subst X: 'C:\path\to\workspace'
+cd X:\MeshCore
+$env:PLATFORMIO_CORE_DIR='X:\.platformio'
+python -m platformio run -e t1000e_companion_radio_ble
+</code></pre>
+<p>Create a UF2 after a successful build:</p>
+<pre><code class="language-powershell">python bin\uf2conv\uf2conv.py .pio\build\t1000e_companion_radio_ble\firmware.hex -c -o .pio\build\t1000e_companion_radio_ble\firmware.uf2 -f 0xADA52840
+</code></pre>
+<h2 id="modified-areas">Modified Areas</h2>
+<p>The implementation is intentionally scoped to the companion radio firmware and T1000-E BLE target:</p>
+<ul>
+<li><code>examples/companion_radio/MyMesh.cpp</code></li>
+<li><code>examples/companion_radio/MyMesh.h</code></li>
+<li><code>examples/companion_radio/NodePrefs.h</code></li>
+<li><code>examples/companion_radio/DataStore.cpp</code></li>
+<li><code>examples/companion_radio/AbstractUITask.h</code></li>
+<li><code>examples/companion_radio/ui-orig/UITask.cpp</code></li>
+<li><code>examples/companion_radio/ui-orig/UITask.h</code></li>
+<li><code>variants/t1000-e/platformio.ini</code></li>
+</ul>
+<h2 id="notes">Notes</h2>
+<ul>
+<li>This is a custom firmware fork, not an official MeshCore release.</li>
+<li>Flash only firmware built for the Seeed Studio SenseCAP T1000-E.</li>
+<li>Group names are case-sensitive.</li>
+<li>GPS coordinates are only useful after the GPS has a valid fix.</li>
+<li>The Find sound is intended for nearby recovery, not remote location tracking.</li>
+</ul>
+
+
+
+
+
+
+
+
+
+
+
+
+                
+              </article>
+            </div>
+          
+          
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
+        </div>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+  
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+      Material for MkDocs
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    
+    
+      
+      
+      <script id="__config" type="application/json">{"annotate": null, "base": "..", "features": ["content.action.edit", "content.code.copy", "search.highlight", "search.suggest"], "search": "../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": null}</script>
+    
+    
+      <script src="../assets/javascripts/bundle.79ae519e.min.js"></script>
+      
+    
+  </body>
+</html>
