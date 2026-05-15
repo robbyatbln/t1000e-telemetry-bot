@@ -2,9 +2,9 @@
 
 ## Deutsche Kurzbeschreibung
 
-Diese Firmware ist eine angepasste MeshCore BLE Companion Firmware fuer den Seeed Studio SenseCAP T1000-E. Sie ist fuer Leute gedacht, die MeshCore bereits nutzen und den T1000-E als automatischen Telemetrie-Sender in einer MeshCore-Gruppe betreiben wollen.
+Diese Firmware ist eine angepasste MeshCore BLE Companion Firmware fuer den Seeed Studio SenseCAP T1000-E. Sie ist fuer Leute gedacht, die MeshCore bereits nutzen und den T1000-E als einfachen Tracker einsetzen wollen, zum Beispiel fuer Kinder, Tiere, Gruppen auf Veranstaltungen, Treffen im Park oder andere Situationen, in denen man ohne Mobilfunknetz sehen moechte, wo etwas oder jemand gerade ist.
 
-Die Firmware bleibt grundsaetzlich eine normale MeshCore Companion Firmware: Verbindung per Android/iOS/Web-App, Gruppen, Kontakte, Region und normale Nachrichten funktionieren weiterhin wie gewohnt. Zusaetzlich gibt es einen Telemetrie-Bot, der per Direktnachricht gesteuert wird.
+Die Firmware bleibt grundsaetzlich eine normale MeshCore Companion Firmware: Verbindung per Android/iOS/Web-App, Gruppen, Kontakte, Region und normale Nachrichten funktionieren weiterhin wie gewohnt. Zusaetzlich gibt es eine Tracking-Funktion, die Akku, Position und Sensorwerte regelmaessig in eine ausgewaehlte MeshCore-Gruppe schreibt und per Direktnachricht gesteuert wird.
 
 ## Unterschiede zur normalen MeshCore T1000-E Firmware
 
@@ -23,8 +23,9 @@ Die Firmware bleibt grundsaetzlich eine normale MeshCore Companion Firmware: Ver
 
 ## Wofuer ist diese Firmware gedacht?
 
-- T1000-E am Rucksack, Fahrrad, Auto, Werkzeugkoffer oder an einer mobilen Station.
-- Regelmaessige Statusmeldung in eine MeshCore-Gruppe.
+- T1000-E am Rucksack eines Kindes, am Tierhalsband, Fahrrad, Auto, Werkzeugkoffer oder an einer mobilen Station.
+- Veranstaltungen, Parktreffen, Camps oder andere Orte, an denen eine Gruppe ohne Mobilfunknetz grob sehen moechte, wo jemand oder etwas ist.
+- Regelmaessige Standort- und Statusmeldung in eine MeshCore-Gruppe.
 - Schnelles Wiederfinden in der Naehe per `config wo ist`.
 - Einfache Fernsteuerung ohne neue Android-App und ohne Custom-Var-Menue.
 
