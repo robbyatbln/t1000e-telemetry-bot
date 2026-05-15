@@ -8,6 +8,9 @@
 #define ADVERT_LOC_NONE       0
 #define ADVERT_LOC_SHARE      1
 
+#define TELEMETRY_PUSH_MODE_DIRECT  0
+#define TELEMETRY_PUSH_MODE_FLOOD   1
+
 struct NodePrefs {  // persisted to file
   float airtime_factor;
   char node_name[32];
@@ -41,4 +44,7 @@ struct NodePrefs {  // persisted to file
   char telemetry_push_group_name[32];    // group/channel name used for periodic telemetry
   char telemetry_push_label[16];         // first word in outgoing telemetry messages
   char telemetry_command_prefix[16];     // command prefix, e.g. "config"
+  uint8_t telemetry_push_mode;           // TELEMETRY_PUSH_MODE_*
+  uint8_t telemetry_target_pub_key[32];  // direct recipient for private periodic telemetry
+  uint8_t ble_auto_off;                  // disable BLE advertising after idle timeout
 };

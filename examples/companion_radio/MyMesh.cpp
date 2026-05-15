@@ -128,6 +128,8 @@
 #define TELEMETRY_FIELD_TEMP   0x04
 #define TELEMETRY_FIELD_LIGHT  0x08
 #define TELEMETRY_FIELD_ALL    (TELEMETRY_FIELD_BATT | TELEMETRY_FIELD_GPS | TELEMETRY_FIELD_TEMP | TELEMETRY_FIELD_LIGHT)
+#define TELEMETRY_MIN_INTERVAL_MINS 10
+#define BLE_IDLE_AUTO_OFF_MILLIS (10UL * 60UL * 1000UL)
 
 // these are _pushed_ to client app at any time
 #define PUSH_CODE_ADVERT                0x80
@@ -878,6 +880,8 @@ MyMesh::MyMesh(mesh::Radio &radio, mesh::RNG &rng, mesh::RTCClock &rtc, SimpleMe
   sign_data = NULL;
   dirty_contacts_expiry = 0;
   next_telemetry_push = 0;
+  ble_idle_started = 0;
+  ble_was_connected = false;
   memset(advert_paths, 0, sizeof(advert_paths));
   memset(send_scope.key, 0, sizeof(send_scope.key));
 
@@ -899,6 +903,9 @@ MyMesh::MyMesh(mesh::Radio &radio, mesh::RNG &rng, mesh::RTCClock &rtc, SimpleMe
   _prefs.telemetry_push_group_name[0] = 0;
   strcpy(_prefs.telemetry_push_label, "Telemetry");
   strcpy(_prefs.telemetry_command_prefix, "config");
+  _prefs.telemetry_push_mode = TELEMETRY_PUSH_MODE_DIRECT;
+  memset(_prefs.telemetry_target_pub_key, 0, sizeof(_prefs.telemetry_target_pub_key));
+  _prefs.ble_auto_off = 1;
   //_prefs.rx_delay_base = 10.0f;  enable once new algo fixed
 #if defined(USE_SX1262) || defined(USE_SX1268)
 #ifdef SX126X_RX_BOOSTED_GAIN
@@ -960,8 +967,13 @@ void MyMesh::begin(bool has_display) {
   _prefs.telemetry_push_interval_mins = TELEMETRY_PUSH_DEFAULT_INTERVAL_MINS;
 #endif
   _prefs.telemetry_push_interval_mins = constrain(_prefs.telemetry_push_interval_mins, 0, 1440);
+  if (_prefs.telemetry_push_interval_mins > 0 && _prefs.telemetry_push_interval_mins < TELEMETRY_MIN_INTERVAL_MINS) {
+    _prefs.telemetry_push_interval_mins = TELEMETRY_MIN_INTERVAL_MINS;
+  }
   _prefs.telemetry_push_group_idx = constrain(_prefs.telemetry_push_group_idx, 0, MAX_GROUP_CHANNELS - 1);
   _prefs.telemetry_push_enabled = constrain(_prefs.telemetry_push_enabled, 0, 1);
+  _prefs.telemetry_push_mode = constrain(_prefs.telemetry_push_mode, 0, 1);
+  _prefs.ble_auto_off = constrain(_prefs.ble_auto_off, 0, 1);
   _prefs.telemetry_push_fields &= TELEMETRY_FIELD_ALL;
   if (_prefs.telemetry_push_fields == 0) _prefs.telemetry_push_fields = TELEMETRY_FIELD_ALL;
   _prefs.telemetry_push_group_name[sizeof(_prefs.telemetry_push_group_name) - 1] = 0;
@@ -1038,6 +1050,7 @@ bool MyMesh::isValidClientRepeatFreq(uint32_t f) const {
 void MyMesh::startInterface(BaseSerialInterface &serial) {
   _serial = &serial;
   serial.enable();
+  ble_idle_started = millis();
 }
 
 void MyMesh::handleCmdFrame(size_t len) {
@@ -2243,6 +2256,17 @@ bool MyMesh::sendSelfAdvertZeroHop() {
   return true;
 }
 
+bool MyMesh::hasTelemetryTarget() const {
+  for (size_t i = 0; i < sizeof(_prefs.telemetry_target_pub_key); i++) {
+    if (_prefs.telemetry_target_pub_key[i] != 0) return true;
+  }
+  return false;
+}
+
+void MyMesh::setTelemetryTarget(const ContactInfo& contact) {
+  memcpy(_prefs.telemetry_target_pub_key, contact.id.pub_key, sizeof(_prefs.telemetry_target_pub_key));
+}
+
 void MyMesh::sendTelemetryControlReply(const ContactInfo& to, const char* text) {
   uint32_t expected_ack, est_timeout;
   sendMessage(to, getRTCClock()->getCurrentTime(), 0, text, expected_ack, est_timeout);
@@ -2286,7 +2310,7 @@ bool MyMesh::handleTelemetryControlMessage(const ContactInfo& from, const char* 
   uint8_t fields = 0;
 
   if (strcmp(body, "help") == 0 || strcmp(body, "?") == 0) {
-    sendTelemetryControlReply(from, "help: config start/stop/status; group NAME; label WORD; interval N; gps/akku/temp/licht/all; sound on/off; wo ist; prefix WORD");
+    sendTelemetryControlReply(from, "help: start/stop/status, direct/flood, target me, group NAME, scope NAME/off, interval N>=10, gps/akku/temp/licht/all, ble on/off, sound on/off, prefix WORD");
     return true;
   }
 
@@ -2312,17 +2336,93 @@ bool MyMesh::handleTelemetryControlMessage(const ContactInfo& from, const char* 
     char* value = original_body + ((body[0] == 'g') ? 6 : 8);
     while (*value == ' ') value++;
     if (*value != 0) {
-      StrHelper::strzcpy(_prefs.telemetry_push_group_name, value, sizeof(_prefs.telemetry_push_group_name));
-      recognized = true;
-      changed = true;
+      if (strcmp(value, "Public") == 0 || strcmp(value, "public") == 0) {
+        sendTelemetryControlReply(from, "Nein: Public wird fuer Tracking nicht verwendet. Bitte privaten Kanalnamen setzen.");
+        return true;
+      } else {
+        StrHelper::strzcpy(_prefs.telemetry_push_group_name, value, sizeof(_prefs.telemetry_push_group_name));
+        recognized = true;
+        changed = true;
+      }
     }
   }
   if (strncmp(body, "interval ", 9) == 0 || strncmp(body, "min ", 4) == 0) {
     char* value = body + ((body[0] == 'i') ? 9 : 4);
     while (*value == ' ') value++;
     int mins = atoi(value);
-    if (mins >= 0) {
+    if (mins == 0 || mins >= TELEMETRY_MIN_INTERVAL_MINS) {
       _prefs.telemetry_push_interval_mins = constrain(mins, 0, 1440);
+      recognized = true;
+      changed = true;
+    } else {
+      sendTelemetryControlReply(from, "Nein: Intervall muss 0 oder mindestens 10 Minuten sein.");
+      return true;
+    }
+  }
+  if (strcmp(body, "direct") == 0 || strcmp(body, "mode direct") == 0 || strcmp(body, "privat") == 0) {
+    _prefs.telemetry_push_mode = TELEMETRY_PUSH_MODE_DIRECT;
+    setTelemetryTarget(from);
+    recognized = true;
+    changed = true;
+  }
+  if (strcmp(body, "flood") == 0 || strcmp(body, "mode flood") == 0 || strcmp(body, "gruppe") == 0) {
+    _prefs.telemetry_push_mode = TELEMETRY_PUSH_MODE_FLOOD;
+    recognized = true;
+    changed = true;
+  }
+  if (strcmp(body, "target me") == 0 || strcmp(body, "ziel ich") == 0 || strcmp(body, "ziel mich") == 0) {
+    setTelemetryTarget(from);
+    _prefs.telemetry_push_mode = TELEMETRY_PUSH_MODE_DIRECT;
+    recognized = true;
+    changed = true;
+  }
+  if (strncmp(body, "scope ", 6) == 0 || strncmp(body, "scoope ", 7) == 0) {
+    int scope_offset = strncmp(body, "scope ", 6) == 0 ? 6 : 7;
+    char* value = original_body + scope_offset;
+    while (*value == ' ') value++;
+    char* lower_value = body + scope_offset;
+    while (*lower_value == ' ') lower_value++;
+    if (strcmp(lower_value, "off") == 0 || strcmp(lower_value, "aus") == 0) {
+      memset(_prefs.default_scope_name, 0, sizeof(_prefs.default_scope_name));
+      memset(_prefs.default_scope_key, 0, sizeof(_prefs.default_scope_key));
+      recognized = true;
+      changed = true;
+    } else if (*value != 0) {
+      TransportKeyStore temp;
+      TransportKey key;
+      char scoped_name[32];
+      StrHelper::strzcpy(scoped_name, value, sizeof(scoped_name));
+      StrHelper::strzcpy(_prefs.default_scope_name, scoped_name, sizeof(_prefs.default_scope_name));
+      if (scoped_name[0] == '#') {
+        temp.getAutoKeyFor(0, scoped_name, key);
+      } else {
+        char hash_name[32];
+        snprintf(hash_name, sizeof(hash_name), "#%s", scoped_name);
+        temp.getAutoKeyFor(0, hash_name, key);
+      }
+      memcpy(_prefs.default_scope_key, key.key, sizeof(_prefs.default_scope_key));
+      recognized = true;
+      changed = true;
+    }
+  }
+  if (strncmp(body, "ble ", 4) == 0 || strncmp(body, "bluetooth ", 10) == 0) {
+    char* value = body + (body[0] == 'b' && body[1] == 'l' && body[2] == 'e' ? 4 : 10);
+    while (*value == ' ') value++;
+    if (strcmp(value, "on") == 0 || strcmp(value, "an") == 0) {
+      if (_serial) {
+        _serial->enable();
+        ble_idle_started = millis();
+      }
+      recognized = true;
+    } else if (strcmp(value, "off") == 0 || strcmp(value, "aus") == 0) {
+      if (_serial) _serial->disable();
+      recognized = true;
+    } else if (strcmp(value, "auto on") == 0 || strcmp(value, "auto an") == 0) {
+      _prefs.ble_auto_off = 1;
+      recognized = true;
+      changed = true;
+    } else if (strcmp(value, "auto off") == 0 || strcmp(value, "auto aus") == 0) {
+      _prefs.ble_auto_off = 0;
       recognized = true;
       changed = true;
     }
@@ -2350,6 +2450,7 @@ bool MyMesh::handleTelemetryControlMessage(const ContactInfo& from, const char* 
   if (strstr(body, "start")) {
     recognized = true;
     enable = true;
+    setTelemetryTarget(from);
   }
   if (strstr(body, "stop")) {
     recognized = true;
@@ -2397,23 +2498,77 @@ bool MyMesh::handleTelemetryControlMessage(const ContactInfo& from, const char* 
     if (enable) next_telemetry_push = futureMillis(3000);
   }
 
-  char reply[140];
-  snprintf(reply, sizeof(reply), "OK: %s %s, Gruppe '%s', Prefix '%s', Ton %s, alle %u min, Felder:%s%s%s%s",
+  char reply[160];
+  snprintf(reply, sizeof(reply), "OK: %s %s, %s, %u min, Ton %s, BLE %s\n%s%s%s%s",
            _prefs.telemetry_push_label,
            _prefs.telemetry_push_enabled ? "AN" : "AUS",
-           _prefs.telemetry_push_group_name[0] ? _prefs.telemetry_push_group_name : "(index)",
-           _prefs.telemetry_command_prefix,
-           _prefs.buzzer_quiet ? "AUS" : "AN",
+           _prefs.telemetry_push_mode == TELEMETRY_PUSH_MODE_DIRECT ? "Direct" :
+             (_prefs.telemetry_push_group_name[0] ? _prefs.telemetry_push_group_name : "Flood"),
            _prefs.telemetry_push_interval_mins,
-           (_prefs.telemetry_push_fields & TELEMETRY_FIELD_BATT) ? " akku" : "",
-           (_prefs.telemetry_push_fields & TELEMETRY_FIELD_GPS) ? " gps" : "",
-           (_prefs.telemetry_push_fields & TELEMETRY_FIELD_TEMP) ? " temp" : "",
-           (_prefs.telemetry_push_fields & TELEMETRY_FIELD_LIGHT) ? " licht" : "");
+           _prefs.buzzer_quiet ? "aus" : "an",
+           (_serial && _serial->isEnabled()) ? (_prefs.ble_auto_off ? "auto" : "an") : "aus",
+           (_prefs.telemetry_push_fields & TELEMETRY_FIELD_BATT) ? "🔋 Akku " : "",
+           (_prefs.telemetry_push_fields & TELEMETRY_FIELD_TEMP) ? "🌡️ Temp " : "",
+           (_prefs.telemetry_push_fields & TELEMETRY_FIELD_GPS) ? "🗺️ GPS 🛰️ " : "",
+           (_prefs.telemetry_push_fields & TELEMETRY_FIELD_LIGHT) ? "💡Licht🔦" : "");
   sendTelemetryControlReply(from, reply);
   return true;
 }
 
 bool MyMesh::sendTelemetryPush() {
+  char text[180];
+  int pos = 0;
+  uint16_t batt_mv = board.getBattMilliVolts();
+#ifdef T1000_E
+  float temp_c = t1000e_get_temperature();
+  uint32_t light = t1000e_get_light();
+#else
+  float temp_c = 0.0f;
+  uint32_t light = 0;
+#endif
+
+  pos += snprintf(&text[pos], sizeof(text) - pos, "%s:", _prefs.telemetry_push_label);
+  if (_prefs.telemetry_push_fields & TELEMETRY_FIELD_BATT) {
+    pos += snprintf(&text[pos], sizeof(text) - pos, "\n🔋 Akku %.2fV", batt_mv / 1000.0f);
+  }
+  if (_prefs.telemetry_push_fields & TELEMETRY_FIELD_TEMP) {
+    pos += snprintf(&text[pos], sizeof(text) - pos, "\n🌡️ Temp %.1fC", temp_c);
+  }
+  if (_prefs.telemetry_push_fields & TELEMETRY_FIELD_GPS) {
+    pos += snprintf(&text[pos], sizeof(text) - pos, "\n🗺️ GPS 🛰️ https://maps.google.com/?q=%.6f,%.6f",
+                    sensors.node_lat, sensors.node_lon);
+  }
+  if (_prefs.telemetry_push_fields & TELEMETRY_FIELD_LIGHT) {
+    pos += snprintf(&text[pos], sizeof(text) - pos, "\n💡Licht🔦 %lu%%", (unsigned long)light);
+  }
+
+  if (_prefs.telemetry_push_mode == TELEMETRY_PUSH_MODE_FLOOD) {
+    return sendTelemetryPushFlood(text);
+  }
+  return sendTelemetryPushDirect(text);
+}
+
+bool MyMesh::sendTelemetryPushDirect(const char* text) {
+  if (!hasTelemetryTarget()) {
+    MESH_DEBUG_PRINTLN("Periodic telemetry: direct target not configured");
+    return false;
+  }
+
+  ContactInfo* target = lookupContactByPubKey(_prefs.telemetry_target_pub_key, PUB_KEY_SIZE);
+  if (!target) {
+    MESH_DEBUG_PRINTLN("Periodic telemetry: direct target not found");
+    return false;
+  }
+  if (target->out_path_len == OUT_PATH_UNKNOWN) {
+    MESH_DEBUG_PRINTLN("Periodic telemetry: no direct path to target");
+    return false;
+  }
+
+  uint32_t expected_ack, est_timeout;
+  return sendMessage(*target, getRTCClock()->getCurrentTime(), 0, text, expected_ack, est_timeout) == MSG_SEND_SENT_DIRECT;
+}
+
+bool MyMesh::sendTelemetryPushFlood(const char* text) {
   ChannelDetails channel;
   if (_prefs.telemetry_push_group_name[0] != 0) {
     bool found = false;
@@ -2432,30 +2587,9 @@ bool MyMesh::sendTelemetryPush() {
     return false;
   }
 
-  char text[160];
-  int pos = 0;
-  uint16_t batt_mv = board.getBattMilliVolts();
-#ifdef T1000_E
-  float temp_c = t1000e_get_temperature();
-  uint32_t light = t1000e_get_light();
-#else
-  float temp_c = 0.0f;
-  uint32_t light = 0;
-#endif
-
-  pos += snprintf(&text[pos], sizeof(text) - pos, "%s:", _prefs.telemetry_push_label);
-  if (_prefs.telemetry_push_fields & TELEMETRY_FIELD_BATT) {
-    pos += snprintf(&text[pos], sizeof(text) - pos, " Akku %.2fV", batt_mv / 1000.0f);
-  }
-  if (_prefs.telemetry_push_fields & TELEMETRY_FIELD_TEMP) {
-    pos += snprintf(&text[pos], sizeof(text) - pos, " Temp %.1fC", temp_c);
-  }
-  if (_prefs.telemetry_push_fields & TELEMETRY_FIELD_LIGHT) {
-    pos += snprintf(&text[pos], sizeof(text) - pos, " Licht %lu%%", (unsigned long)light);
-  }
-  if (_prefs.telemetry_push_fields & TELEMETRY_FIELD_GPS) {
-    pos += snprintf(&text[pos], sizeof(text) - pos, " GPS https://maps.google.com/?q=%.6f,%.6f",
-                    sensors.node_lat, sensors.node_lon);
+  if (strcmp(channel.name, "Public") == 0 || strcmp(channel.name, "public") == 0) {
+    MESH_DEBUG_PRINTLN("Periodic telemetry: refusing to send tracking data to Public");
+    return false;
   }
 
   bool sent = sendGroupMessage(getRTCClock()->getCurrentTime(), channel.channel, _prefs.node_name,
@@ -2470,6 +2604,28 @@ void MyMesh::checkTelemetryPush() {
   if (next_telemetry_push && millisHasNowPassed(next_telemetry_push)) {
     sendTelemetryPush();
     scheduleTelemetryPush();
+  }
+}
+
+void MyMesh::checkBlePowerSave() {
+  if (!_serial || !_prefs.ble_auto_off || !_serial->isEnabled()) return;
+
+  bool connected = _serial->isConnected();
+  if (connected) {
+    ble_was_connected = true;
+    ble_idle_started = 0;
+    return;
+  }
+
+  if (ble_was_connected || ble_idle_started == 0) {
+    ble_was_connected = false;
+    ble_idle_started = millis();
+    return;
+  }
+
+  if (millisHasNowPassed(ble_idle_started + BLE_IDLE_AUTO_OFF_MILLIS)) {
+    _serial->disable();
+    ble_idle_started = 0;
   }
 }
 
@@ -2489,9 +2645,10 @@ void MyMesh::loop() {
   }
 
   checkTelemetryPush();
+  checkBlePowerSave();
 
 #ifdef DISPLAY_CLASS
-  if (_ui) _ui->setHasConnection(_serial->isConnected());
+  if (_ui) _ui->setHasConnection(_serial && _serial->isConnected());
 #endif
 }
 

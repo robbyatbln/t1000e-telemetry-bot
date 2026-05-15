@@ -2,7 +2,7 @@
 
 Dies ist eine angepasste MeshCore BLE Companion Firmware fuer den Seeed Studio SenseCAP T1000-E. Sie richtet sich an Nutzer, die MeshCore bereits kennen und den T1000-E als einfachen Tracker einsetzen wollen, zum Beispiel fuer Kinder, Tiere, Gruppen auf Veranstaltungen, Treffen im Park oder andere Situationen, in denen man ohne Mobilfunknetz sehen moechte, wo etwas oder jemand gerade ist.
 
-Der Unterschied zur normalen MeshCore T1000-E Companion Firmware: Dieses Build sendet Akku, GPS, Temperatur und Licht automatisch als sichtbare Gruppennachricht, kann per Direktnachricht gestartet/gestoppt und konfiguriert werden, erzeugt Google-Maps-Links und kann per `config wo ist` ein Suchsignal am Geraet abspielen. Es geht also nicht um "noch einen Bot", sondern um eine praktische Tracking-Funktion direkt im MeshCore-Chat.
+Der Unterschied zur normalen MeshCore T1000-E Companion Firmware: Dieses Build sendet Akku, GPS, Temperatur und Licht bevorzugt als private Direktnachricht, kann bei Bedarf bewusst auf Flood in einen privaten Kanal gestellt werden, erzeugt Google-Maps-Links und kann per `config wo ist` ein Suchsignal am Geraet abspielen. Es geht also nicht um "noch einen Bot", sondern um eine praktische Tracking-Funktion direkt im MeshCore-Chat.
 
 Fertige Firmware-Dateien liegen in [`firmware/`](./firmware). Die vollstaendige deutsche Anleitung und der Vergleich zur Original-Firmware stehen hier: [`docs/t1000e-telemetry-bot.md`](./docs/t1000e-telemetry-bot.md).
 

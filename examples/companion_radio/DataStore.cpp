@@ -240,6 +240,9 @@ void DataStore::loadPrefsInt(const char *filename, NodePrefs& _prefs, double& no
     file.read((uint8_t *)_prefs.telemetry_push_group_name, sizeof(_prefs.telemetry_push_group_name));         // 142
     file.read((uint8_t *)_prefs.telemetry_push_label, sizeof(_prefs.telemetry_push_label));                   // 174
     file.read((uint8_t *)_prefs.telemetry_command_prefix, sizeof(_prefs.telemetry_command_prefix));           // 190
+    file.read((uint8_t *)&_prefs.telemetry_push_mode, sizeof(_prefs.telemetry_push_mode));                    // 206
+    file.read((uint8_t *)_prefs.telemetry_target_pub_key, sizeof(_prefs.telemetry_target_pub_key));            // 207
+    file.read((uint8_t *)&_prefs.ble_auto_off, sizeof(_prefs.ble_auto_off));                                  // 239
 
     file.close();
   }
@@ -287,6 +290,9 @@ void DataStore::savePrefs(const NodePrefs& _prefs, double node_lat, double node_
     file.write((uint8_t *)_prefs.telemetry_push_group_name, sizeof(_prefs.telemetry_push_group_name));         // 142
     file.write((uint8_t *)_prefs.telemetry_push_label, sizeof(_prefs.telemetry_push_label));                   // 174
     file.write((uint8_t *)_prefs.telemetry_command_prefix, sizeof(_prefs.telemetry_command_prefix));           // 190
+    file.write((uint8_t *)&_prefs.telemetry_push_mode, sizeof(_prefs.telemetry_push_mode));                    // 206
+    file.write((uint8_t *)_prefs.telemetry_target_pub_key, sizeof(_prefs.telemetry_target_pub_key));            // 207
+    file.write((uint8_t *)&_prefs.ble_auto_off, sizeof(_prefs.ble_auto_off));                                  // 239
 
     file.close();
   }

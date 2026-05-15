@@ -197,9 +197,14 @@ private:
   void scheduleTelemetryPush();
   void checkTelemetryPush();
   bool sendTelemetryPush();
+  bool sendTelemetryPushDirect(const char* text);
+  bool sendTelemetryPushFlood(const char* text);
   bool sendSelfAdvertZeroHop();
   bool handleTelemetryControlMessage(const ContactInfo& from, const char* text);
   void sendTelemetryControlReply(const ContactInfo& to, const char* text);
+  bool hasTelemetryTarget() const;
+  void setTelemetryTarget(const ContactInfo& contact);
+  void checkBlePowerSave();
   bool isValidClientRepeatFreq(uint32_t f) const;
 
   // helpers, short-cuts
@@ -233,6 +238,8 @@ private:
   uint8_t out_frame[MAX_FRAME_SIZE + 1];
   CayenneLPP telemetry;
   unsigned long next_telemetry_push;
+  unsigned long ble_idle_started;
+  bool ble_was_connected;
 
   struct Frame {
     uint8_t len;

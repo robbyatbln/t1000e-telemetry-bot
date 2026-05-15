@@ -10,22 +10,24 @@ Die Firmware bleibt grundsaetzlich eine normale MeshCore Companion Firmware: Ver
 
 | Bereich | Normale MeshCore T1000-E Companion Firmware | Diese Telemetry-Bot Firmware |
 | --- | --- | --- |
-| Telemetrie | Telemetrie kann abgefragt werden, wird aber nicht automatisch als Chattext in eine Gruppe geschrieben. | Sendet Akku, GPS, Temperatur und Licht automatisch als sichtbare Gruppennachricht. |
+| Telemetrie | Telemetrie kann abgefragt werden, wird aber nicht automatisch als Chattext verschickt. | Sendet Akku, GPS, Temperatur und Licht automatisch, standardmaessig als private Direktnachricht. |
 | Steuerung | Einstellungen hauptsaechlich ueber App/Companion-Protokoll. | Start, Stop, Status und Konfiguration per Direktnachricht, z. B. `config start`. |
-| Zielgruppe | Keine feste automatische Telemetrie-Zielgruppe. | Zielgruppe per Name konfigurierbar, z. B. `config group Robbys_channel`. |
+| Zielgruppe | Keine feste automatische Telemetrie-Zielgruppe. | Standard ist Direct an den steuernden Kontakt. Flood in einen privaten Kanal muss bewusst aktiviert werden. |
 | Nachrichtentext | Keine automatische Chat-Nachricht mit Sensorwerten. | Erstes Wort/Label konfigurierbar, z. B. `config label tracker`. |
-| GPS | Positionsdaten koennen im MeshCore-Kontext genutzt werden. | GPS wird optional als Google-Maps-Link in die Gruppennachricht geschrieben. |
-| Intervall | Kein automatischer 5-Minuten-Gruppenpush. | Intervall per Direktnachricht einstellbar, z. B. `config interval 5`. |
+| GPS | Positionsdaten koennen im MeshCore-Kontext genutzt werden. | GPS wird optional als Google-Maps-Link in die Telemetrie-Nachricht geschrieben. |
+| Intervall | Kein automatischer Telemetrie-Push. | Intervall per Direktnachricht einstellbar, mindestens 10 Minuten. |
 | Felder | Keine Chat-Auswahl per Textbefehl. | Felder per Direktnachricht waehlbar: `gps`, `akku`, `temp`, `licht`, `all`. |
 | Quittung | Keine Bot-artige Rueckmeldung auf solche Befehle. | Jeder erkannte Befehl wird per Direktnachricht bestaetigt. |
 | Suchton | Standard-Buzzer-Sounds je nach UI/Build. | `config wo ist` spielt ein Suchsignal am Geraet. |
 | Tonsteuerung | Buzzer kann lokal/UI-abhaengig gesteuert werden. | `config sound off` und `config sound on` per Direktnachricht. |
+| Bluetooth | BLE bleibt normalerweise fuer die App verfuegbar. | BLE kann nach 10 Minuten ohne Verbindung automatisch abschalten und per Direktnachricht wieder eingeschaltet werden. |
 
 ## Wofuer ist diese Firmware gedacht?
 
 - T1000-E am Rucksack eines Kindes, am Tierhalsband, Fahrrad, Auto, Werkzeugkoffer oder an einer mobilen Station.
 - Veranstaltungen, Parktreffen, Camps oder andere Orte, an denen eine Gruppe ohne Mobilfunknetz grob sehen moechte, wo jemand oder etwas ist.
-- Regelmaessige Standort- und Statusmeldung in eine MeshCore-Gruppe.
+- Regelmaessige private Standort- und Statusmeldung an einen MeshCore-Kontakt.
+- Optionaler Flood-Versand in einen privaten MeshCore-Kanal, wenn eine Gruppe es bewusst sehen soll.
 - Schnelles Wiederfinden in der Naehe per `config wo ist`.
 - Einfache Fernsteuerung ohne neue Android-App und ohne Custom-Var-Menue.
 
@@ -58,13 +60,14 @@ Wichtig: Im Web-Flasher die ZIP-Datei verwenden. Die UF2-Datei nur direkt auf da
 
 Im aktuellen Build sind diese Defaults gesetzt:
 
-- Zielgruppe: `Robbys_channel`
-- Intervall: 5 Minuten
+- Versand: private Direktnachricht an den Kontakt, der `config start` sendet
+- Flood-Zielgruppe bei bewusst aktiviertem Flood-Modus: `Robbys_channel`
+- Intervall: 10 Minuten
 - Befehlswort: `config`
 - Nachrichten-Label: `Telemetry`
 - Felder: Akku, GPS, Temperatur, Licht
 
-Die Zielgruppe muss auf dem Geraet existieren und exakt gleich geschrieben sein.
+Der automatische Versand geht zuerst privat per Direct. Ein Gruppen-/Flood-Versand passiert nur nach `config flood`. Der Kanal `Public` wird fuer Tracking nicht verwendet.
 
 ## Befehle per Direktnachricht
 
@@ -74,13 +77,22 @@ Alle Befehle werden als Direktnachricht an den T1000-E gesendet. Jeder erkannte 
 | --- | --- |
 | `config help` | Gibt eine kurze Befehlsuebersicht zurueck. |
 | `config status` | Gibt aktuelle Einstellungen zurueck. |
-| `config start` | Startet den periodischen Versand. Erste Meldung nach ca. 3 Sekunden. |
+| `config start` | Startet den periodischen Direct-Versand an den Absender. Erste Meldung nach ca. 3 Sekunden. |
 | `config stop` | Stoppt den periodischen Versand. |
-| `config group Robbys_channel` | Setzt die Zielgruppe. |
-| `config interval 5` | Setzt das Intervall in Minuten. |
-| `config label test` | Setzt das erste Wort der Gruppennachricht, z. B. `test:`. |
+| `config direct` | Stellt den Versand auf private Direktnachricht. |
+| `config target me` | Setzt den Absender als Direct-Ziel. |
+| `config flood` | Stellt bewusst auf Flood-Versand in einen privaten Kanal. |
+| `config group Robbys_channel` | Setzt die Flood-Zielgruppe. `Public` wird abgelehnt. |
+| `config scope PARK` | Setzt den Flood-Scope fuer gezielteres Flooding. |
+| `config scope off` | Entfernt den gesetzten Flood-Scope. |
+| `config interval 10` | Setzt das Intervall in Minuten. 0 oder mindestens 10 Minuten. |
+| `config label test` | Setzt das erste Wort der Telemetrie-Nachricht, z. B. `test:`. |
 | `config all` | Aktiviert alle Felder. |
 | `config gps akku temp licht` | Aktiviert genau diese Felder. |
+| `config ble on` | Schaltet Bluetooth wieder ein, z. B. fuer die App-Verbindung. |
+| `config ble off` | Schaltet Bluetooth aus. |
+| `config ble auto on` | Bluetooth schaltet nach 10 Minuten ohne Verbindung automatisch ab. |
+| `config ble auto off` | Deaktiviert das automatische Bluetooth-Abschalten. |
 | `config sound off` | Deaktiviert normale Tonsignale. |
 | `config sound on` | Aktiviert normale Tonsignale. |
 | `config wo ist` | Spielt ein Suchsignal am Geraet ab. |
@@ -97,10 +109,14 @@ xy label tracker
 
 ## Beispiele
 
-Standardmeldung:
+Standardmeldung als private Direktnachricht:
 
 ```text
-Telemetry: Akku 3.95V Temp 24.1C Licht 42% GPS https://maps.google.com/?q=52.123456,13.123456
+Telemetry:
+🔋 Akku 3.95V
+🌡️ Temp 24.1C
+🗺️ GPS 🛰️ https://maps.google.com/?q=52.123456,13.123456
+💡Licht🔦 42%
 ```
 
 Label und Felder aendern:
@@ -110,10 +126,28 @@ config label test
 config gps akku
 ```
 
-Danach sendet die Gruppe z. B.:
+Danach sendet der T1000-E z. B.:
 
 ```text
-test: Akku 3.95V GPS https://maps.google.com/?q=52.123456,13.123456
+test:
+🔋 Akku 3.95V
+🗺️ GPS 🛰️ https://maps.google.com/?q=52.123456,13.123456
+```
+
+Bewusst in einen privaten Kanal flooden:
+
+```text
+config group Robbys_channel
+config scope PARK
+config flood
+config start
+```
+
+Zurueck auf privaten Direct-Versand:
+
+```text
+config direct
+config target me
 ```
 
 Geraet stumm schalten, aber trotzdem finden:
@@ -172,17 +206,19 @@ python bin\uf2conv\uf2conv.py .pio\build\t1000e_companion_radio_ble\firmware.hex
 
 This fork adds a telemetry bot mode to the MeshCore BLE companion firmware for the Seeed Studio SenseCAP T1000-E.
 
-The firmware periodically sends visible group chat messages with selected telemetry fields and can be controlled by direct messages.
+The firmware periodically sends selected telemetry fields by private direct message by default. Flood/group delivery is only used when explicitly enabled.
 
 ## Features
 
-- Periodic telemetry messages to a configurable MeshCore group.
+- Periodic telemetry messages by direct message.
+- Optional flood delivery to a private MeshCore channel.
 - Direct-message control with acknowledgements.
-- Configurable message label, group name, interval, and telemetry fields.
+- Configurable message label, group name, flood scope, interval, and telemetry fields.
 - Google Maps links for GPS coordinates.
 - Optional zero-hop advert after each telemetry push.
 - Buzzer mute/unmute by direct message.
 - Find-device sound by direct message.
+- BLE auto-off after 10 minutes without an app connection.
 
 ## Firmware Files
 
@@ -213,13 +249,14 @@ Use the ZIP with web flashing. Use the UF2 only when the T1000-E appears as a DF
 
 Default build settings for the T1000-E BLE companion target:
 
-- Target group: `Robbys_channel`
-- Interval: 5 minutes
+- Delivery mode: direct message to the contact that sends `config start`
+- Flood target group when explicitly enabled: `Robbys_channel`
+- Interval: 10 minutes
 - Command prefix: `config`
 - Message label: `Telemetry`
 - Fields: battery, GPS, temperature, light
 
-The group must exist on the device and the group name must match exactly.
+Group/flood delivery must be enabled with `config flood`. The `Public` channel is refused for tracking messages.
 
 ## Direct Message Commands
 
@@ -229,13 +266,22 @@ Send these as direct messages to the T1000-E node.
 | --- | --- |
 | `config help` | Sends a short command list as a direct reply. |
 | `config status` | Sends current settings as a direct reply. |
-| `config start` | Enables periodic telemetry. First message is sent after about 3 seconds. |
+| `config start` | Enables periodic direct telemetry to the sender. First message is sent after about 3 seconds. |
 | `config stop` | Disables periodic telemetry. |
-| `config group Robbys_channel` | Sets the target group by name. |
-| `config interval 5` | Sets the interval in minutes. Use `0` to disable timer scheduling. |
+| `config direct` | Uses private direct delivery. |
+| `config target me` | Sets the sender as the direct target. |
+| `config flood` | Explicitly enables flood delivery to a private channel. |
+| `config group Robbys_channel` | Sets the flood target group by name. `Public` is refused. |
+| `config scope PARK` | Sets the flood scope. |
+| `config scope off` | Clears the flood scope. |
+| `config interval 10` | Sets the interval in minutes. Use `0` or at least `10`. |
 | `config label test` | Sets the first word of every outgoing telemetry message. |
 | `config all` | Enables all telemetry fields. |
 | `config gps akku temp licht` | Selects GPS, battery, temperature, and light fields. |
+| `config ble on` | Enables Bluetooth for app access. |
+| `config ble off` | Disables Bluetooth. |
+| `config ble auto on` | Enables BLE auto-off after 10 idle minutes. |
+| `config ble auto off` | Disables BLE auto-off. |
 | `config sound off` | Mutes normal buzzer notifications. |
 | `config sound on` | Enables normal buzzer notifications. |
 | `config wo ist` | Plays a find-device sound even if normal sound is muted. |
@@ -254,7 +300,11 @@ xy label tracker
 With default settings:
 
 ```text
-Telemetry: Akku 3.95V Temp 24.1C Licht 42% GPS https://maps.google.com/?q=52.123456,13.123456
+Telemetry:
+🔋 Akku 3.95V
+🌡️ Temp 24.1C
+🗺️ GPS 🛰️ https://maps.google.com/?q=52.123456,13.123456
+💡Licht🔦 42%
 ```
 
 After:
@@ -264,10 +314,12 @@ config label test
 config gps akku
 ```
 
-The group message becomes:
+The telemetry message becomes:
 
 ```text
-test: Akku 3.95V GPS https://maps.google.com/?q=52.123456,13.123456
+test:
+🔋 Akku 3.95V
+🗺️ GPS 🛰️ https://maps.google.com/?q=52.123456,13.123456
 ```
 
 ## Build From Source
