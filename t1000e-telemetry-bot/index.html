@@ -1285,8 +1285,8 @@
 <tbody>
 <tr>
 <td>Telemetrie</td>
-<td>Telemetrie kann abgefragt werden, wird aber nicht automatisch als Chattext in eine Gruppe geschrieben.</td>
-<td>Sendet Akku, GPS, Temperatur und Licht automatisch als sichtbare Gruppennachricht.</td>
+<td>Telemetrie kann abgefragt werden, wird aber nicht automatisch als Chattext verschickt.</td>
+<td>Sendet Akku, GPS, Temperatur und Licht automatisch, standardmaessig als private Direktnachricht.</td>
 </tr>
 <tr>
 <td>Steuerung</td>
@@ -1296,7 +1296,7 @@
 <tr>
 <td>Zielgruppe</td>
 <td>Keine feste automatische Telemetrie-Zielgruppe.</td>
-<td>Zielgruppe per Name konfigurierbar, z. B. <code>config group Robbys_channel</code>.</td>
+<td>Standard ist Direct an den steuernden Kontakt. Flood in einen privaten Kanal muss bewusst aktiviert werden.</td>
 </tr>
 <tr>
 <td>Nachrichtentext</td>
@@ -1306,12 +1306,12 @@
 <tr>
 <td>GPS</td>
 <td>Positionsdaten koennen im MeshCore-Kontext genutzt werden.</td>
-<td>GPS wird optional als Google-Maps-Link in die Gruppennachricht geschrieben.</td>
+<td>GPS wird optional als Google-Maps-Link in die Telemetrie-Nachricht geschrieben.</td>
 </tr>
 <tr>
 <td>Intervall</td>
-<td>Kein automatischer 5-Minuten-Gruppenpush.</td>
-<td>Intervall per Direktnachricht einstellbar, z. B. <code>config interval 5</code>.</td>
+<td>Kein automatischer Telemetrie-Push.</td>
+<td>Intervall per Direktnachricht einstellbar, mindestens 10 Minuten.</td>
 </tr>
 <tr>
 <td>Felder</td>
@@ -1333,13 +1333,19 @@
 <td>Buzzer kann lokal/UI-abhaengig gesteuert werden.</td>
 <td><code>config sound off</code> und <code>config sound on</code> per Direktnachricht.</td>
 </tr>
+<tr>
+<td>Bluetooth</td>
+<td>BLE bleibt normalerweise fuer die App verfuegbar.</td>
+<td>BLE kann nach 10 Minuten ohne Verbindung automatisch abschalten und per Direktnachricht wieder eingeschaltet werden.</td>
+</tr>
 </tbody>
 </table>
 <h2 id="wofuer-ist-diese-firmware-gedacht">Wofuer ist diese Firmware gedacht?</h2>
 <ul>
 <li>T1000-E am Rucksack eines Kindes, am Tierhalsband, Fahrrad, Auto, Werkzeugkoffer oder an einer mobilen Station.</li>
 <li>Veranstaltungen, Parktreffen, Camps oder andere Orte, an denen eine Gruppe ohne Mobilfunknetz grob sehen moechte, wo jemand oder etwas ist.</li>
-<li>Regelmaessige Standort- und Statusmeldung in eine MeshCore-Gruppe.</li>
+<li>Regelmaessige private Standort- und Statusmeldung an einen MeshCore-Kontakt.</li>
+<li>Optionaler Flood-Versand in einen privaten MeshCore-Kanal, wenn eine Gruppe es bewusst sehen soll.</li>
 <li>Schnelles Wiederfinden in der Naehe per <code>config wo ist</code>.</li>
 <li>Einfache Fernsteuerung ohne neue Android-App und ohne Custom-Var-Menue.</li>
 </ul>
@@ -1368,13 +1374,14 @@
 <h2 id="standardverhalten">Standardverhalten</h2>
 <p>Im aktuellen Build sind diese Defaults gesetzt:</p>
 <ul>
-<li>Zielgruppe: <code>Robbys_channel</code></li>
-<li>Intervall: 5 Minuten</li>
+<li>Versand: private Direktnachricht an den Kontakt, der <code>config start</code> sendet</li>
+<li>Flood-Zielgruppe bei bewusst aktiviertem Flood-Modus: <code>Robbys_channel</code></li>
+<li>Intervall: 10 Minuten</li>
 <li>Befehlswort: <code>config</code></li>
 <li>Nachrichten-Label: <code>Telemetry</code></li>
 <li>Felder: Akku, GPS, Temperatur, Licht</li>
 </ul>
-<p>Die Zielgruppe muss auf dem Geraet existieren und exakt gleich geschrieben sein.</p>
+<p>Der automatische Versand geht zuerst privat per Direct. Ein Gruppen-/Flood-Versand passiert nur nach <code>config flood</code>. Der Kanal <code>Public</code> wird fuer Tracking nicht verwendet.</p>
 <h2 id="befehle-per-direktnachricht">Befehle per Direktnachricht</h2>
 <p>Alle Befehle werden als Direktnachricht an den T1000-E gesendet. Jeder erkannte Befehl wird ebenfalls per Direktnachricht bestaetigt.</p>
 <table>
@@ -1395,23 +1402,43 @@
 </tr>
 <tr>
 <td><code>config start</code></td>
-<td>Startet den periodischen Versand. Erste Meldung nach ca. 3 Sekunden.</td>
+<td>Startet den periodischen Direct-Versand an den Absender. Erste Meldung nach ca. 3 Sekunden.</td>
 </tr>
 <tr>
 <td><code>config stop</code></td>
 <td>Stoppt den periodischen Versand.</td>
 </tr>
 <tr>
-<td><code>config group Robbys_channel</code></td>
-<td>Setzt die Zielgruppe.</td>
+<td><code>config direct</code></td>
+<td>Stellt den Versand auf private Direktnachricht.</td>
 </tr>
 <tr>
-<td><code>config interval 5</code></td>
-<td>Setzt das Intervall in Minuten.</td>
+<td><code>config target me</code></td>
+<td>Setzt den Absender als Direct-Ziel.</td>
+</tr>
+<tr>
+<td><code>config flood</code></td>
+<td>Stellt bewusst auf Flood-Versand in einen privaten Kanal.</td>
+</tr>
+<tr>
+<td><code>config group Robbys_channel</code></td>
+<td>Setzt die Flood-Zielgruppe. <code>Public</code> wird abgelehnt.</td>
+</tr>
+<tr>
+<td><code>config scope PARK</code></td>
+<td>Setzt den Flood-Scope fuer gezielteres Flooding.</td>
+</tr>
+<tr>
+<td><code>config scope off</code></td>
+<td>Entfernt den gesetzten Flood-Scope.</td>
+</tr>
+<tr>
+<td><code>config interval 10</code></td>
+<td>Setzt das Intervall in Minuten. 0 oder mindestens 10 Minuten.</td>
 </tr>
 <tr>
 <td><code>config label test</code></td>
-<td>Setzt das erste Wort der Gruppennachricht, z. B. <code>test:</code>.</td>
+<td>Setzt das erste Wort der Telemetrie-Nachricht, z. B. <code>test:</code>.</td>
 </tr>
 <tr>
 <td><code>config all</code></td>
@@ -1420,6 +1447,22 @@
 <tr>
 <td><code>config gps akku temp licht</code></td>
 <td>Aktiviert genau diese Felder.</td>
+</tr>
+<tr>
+<td><code>config ble on</code></td>
+<td>Schaltet Bluetooth wieder ein, z. B. fuer die App-Verbindung.</td>
+</tr>
+<tr>
+<td><code>config ble off</code></td>
+<td>Schaltet Bluetooth aus.</td>
+</tr>
+<tr>
+<td><code>config ble auto on</code></td>
+<td>Bluetooth schaltet nach 10 Minuten ohne Verbindung automatisch ab.</td>
+</tr>
+<tr>
+<td><code>config ble auto off</code></td>
+<td>Deaktiviert das automatische Bluetooth-Abschalten.</td>
 </tr>
 <tr>
 <td><code>config sound off</code></td>
@@ -1446,15 +1489,31 @@ xy stop
 xy label tracker
 </code></pre>
 <h2 id="beispiele">Beispiele</h2>
-<p>Standardmeldung:</p>
-<pre><code class="language-text">Telemetry: Akku 3.95V Temp 24.1C Licht 42% GPS https://maps.google.com/?q=52.123456,13.123456
+<p>Standardmeldung als private Direktnachricht:</p>
+<pre><code class="language-text">Telemetry:
+🔋 Akku 3.95V
+🌡️ Temp 24.1C
+🗺️ GPS 🛰️ https://maps.google.com/?q=52.123456,13.123456
+💡Licht🔦 42%
 </code></pre>
 <p>Label und Felder aendern:</p>
 <pre><code class="language-text">config label test
 config gps akku
 </code></pre>
-<p>Danach sendet die Gruppe z. B.:</p>
-<pre><code class="language-text">test: Akku 3.95V GPS https://maps.google.com/?q=52.123456,13.123456
+<p>Danach sendet der T1000-E z. B.:</p>
+<pre><code class="language-text">test:
+🔋 Akku 3.95V
+🗺️ GPS 🛰️ https://maps.google.com/?q=52.123456,13.123456
+</code></pre>
+<p>Bewusst in einen privaten Kanal flooden:</p>
+<pre><code class="language-text">config group Robbys_channel
+config scope PARK
+config flood
+config start
+</code></pre>
+<p>Zurueck auf privaten Direct-Versand:</p>
+<pre><code class="language-text">config direct
+config target me
 </code></pre>
 <p>Geraet stumm schalten, aber trotzdem finden:</p>
 <pre><code class="language-text">config sound off
@@ -1496,16 +1555,18 @@ python -m platformio run -e t1000e_companion_radio_ble
 <hr />
 <h2 id="english-summary">English Summary</h2>
 <p>This fork adds a telemetry bot mode to the MeshCore BLE companion firmware for the Seeed Studio SenseCAP T1000-E.</p>
-<p>The firmware periodically sends visible group chat messages with selected telemetry fields and can be controlled by direct messages.</p>
+<p>The firmware periodically sends selected telemetry fields by private direct message by default. Flood/group delivery is only used when explicitly enabled.</p>
 <h2 id="features">Features</h2>
 <ul>
-<li>Periodic telemetry messages to a configurable MeshCore group.</li>
+<li>Periodic telemetry messages by direct message.</li>
+<li>Optional flood delivery to a private MeshCore channel.</li>
 <li>Direct-message control with acknowledgements.</li>
-<li>Configurable message label, group name, interval, and telemetry fields.</li>
+<li>Configurable message label, group name, flood scope, interval, and telemetry fields.</li>
 <li>Google Maps links for GPS coordinates.</li>
 <li>Optional zero-hop advert after each telemetry push.</li>
 <li>Buzzer mute/unmute by direct message.</li>
 <li>Find-device sound by direct message.</li>
+<li>BLE auto-off after 10 minutes without an app connection.</li>
 </ul>
 <h2 id="firmware-files">Firmware Files</h2>
 <p>Prebuilt firmware artifacts are in the <code>firmware/</code> folder:</p>
@@ -1532,13 +1593,14 @@ python -m platformio run -e t1000e_companion_radio_ble
 <h2 id="default-behavior">Default Behavior</h2>
 <p>Default build settings for the T1000-E BLE companion target:</p>
 <ul>
-<li>Target group: <code>Robbys_channel</code></li>
-<li>Interval: 5 minutes</li>
+<li>Delivery mode: direct message to the contact that sends <code>config start</code></li>
+<li>Flood target group when explicitly enabled: <code>Robbys_channel</code></li>
+<li>Interval: 10 minutes</li>
 <li>Command prefix: <code>config</code></li>
 <li>Message label: <code>Telemetry</code></li>
 <li>Fields: battery, GPS, temperature, light</li>
 </ul>
-<p>The group must exist on the device and the group name must match exactly.</p>
+<p>Group/flood delivery must be enabled with <code>config flood</code>. The <code>Public</code> channel is refused for tracking messages.</p>
 <h2 id="direct-message-commands">Direct Message Commands</h2>
 <p>Send these as direct messages to the T1000-E node.</p>
 <table>
@@ -1559,19 +1621,39 @@ python -m platformio run -e t1000e_companion_radio_ble
 </tr>
 <tr>
 <td><code>config start</code></td>
-<td>Enables periodic telemetry. First message is sent after about 3 seconds.</td>
+<td>Enables periodic direct telemetry to the sender. First message is sent after about 3 seconds.</td>
 </tr>
 <tr>
 <td><code>config stop</code></td>
 <td>Disables periodic telemetry.</td>
 </tr>
 <tr>
-<td><code>config group Robbys_channel</code></td>
-<td>Sets the target group by name.</td>
+<td><code>config direct</code></td>
+<td>Uses private direct delivery.</td>
 </tr>
 <tr>
-<td><code>config interval 5</code></td>
-<td>Sets the interval in minutes. Use <code>0</code> to disable timer scheduling.</td>
+<td><code>config target me</code></td>
+<td>Sets the sender as the direct target.</td>
+</tr>
+<tr>
+<td><code>config flood</code></td>
+<td>Explicitly enables flood delivery to a private channel.</td>
+</tr>
+<tr>
+<td><code>config group Robbys_channel</code></td>
+<td>Sets the flood target group by name. <code>Public</code> is refused.</td>
+</tr>
+<tr>
+<td><code>config scope PARK</code></td>
+<td>Sets the flood scope.</td>
+</tr>
+<tr>
+<td><code>config scope off</code></td>
+<td>Clears the flood scope.</td>
+</tr>
+<tr>
+<td><code>config interval 10</code></td>
+<td>Sets the interval in minutes. Use <code>0</code> or at least <code>10</code>.</td>
 </tr>
 <tr>
 <td><code>config label test</code></td>
@@ -1584,6 +1666,22 @@ python -m platformio run -e t1000e_companion_radio_ble
 <tr>
 <td><code>config gps akku temp licht</code></td>
 <td>Selects GPS, battery, temperature, and light fields.</td>
+</tr>
+<tr>
+<td><code>config ble on</code></td>
+<td>Enables Bluetooth for app access.</td>
+</tr>
+<tr>
+<td><code>config ble off</code></td>
+<td>Disables Bluetooth.</td>
+</tr>
+<tr>
+<td><code>config ble auto on</code></td>
+<td>Enables BLE auto-off after 10 idle minutes.</td>
+</tr>
+<tr>
+<td><code>config ble auto off</code></td>
+<td>Disables BLE auto-off.</td>
 </tr>
 <tr>
 <td><code>config sound off</code></td>
@@ -1610,14 +1708,20 @@ xy label tracker
 </code></pre>
 <h2 id="example-messages">Example Messages</h2>
 <p>With default settings:</p>
-<pre><code class="language-text">Telemetry: Akku 3.95V Temp 24.1C Licht 42% GPS https://maps.google.com/?q=52.123456,13.123456
+<pre><code class="language-text">Telemetry:
+🔋 Akku 3.95V
+🌡️ Temp 24.1C
+🗺️ GPS 🛰️ https://maps.google.com/?q=52.123456,13.123456
+💡Licht🔦 42%
 </code></pre>
 <p>After:</p>
 <pre><code class="language-text">config label test
 config gps akku
 </code></pre>
-<p>The group message becomes:</p>
-<pre><code class="language-text">test: Akku 3.95V GPS https://maps.google.com/?q=52.123456,13.123456
+<p>The telemetry message becomes:</p>
+<pre><code class="language-text">test:
+🔋 Akku 3.95V
+🗺️ GPS 🛰️ https://maps.google.com/?q=52.123456,13.123456
 </code></pre>
 <h2 id="build-from-source">Build From Source</h2>
 <p>Install PlatformIO, then build the T1000-E BLE companion target:</p>
