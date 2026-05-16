@@ -1338,6 +1338,11 @@
 <td>BLE bleibt normalerweise fuer die App verfuegbar.</td>
 <td>BLE kann nach 10 Minuten ohne Verbindung automatisch abschalten und per Direktnachricht wieder eingeschaltet werden.</td>
 </tr>
+<tr>
+<td>Taste</td>
+<td>Standard-UI-Funktionen je nach Build.</td>
+<td>Einmaliges Druecken sendet sofort eine Telemetrie-Nachricht mit der aktuellen Konfiguration.</td>
+</tr>
 </tbody>
 </table>
 <h2 id="wofuer-ist-diese-firmware-gedacht">Wofuer ist diese Firmware gedacht?</h2>
@@ -1354,21 +1359,23 @@
 <ul>
 <li><code>t1000e_companion_radio_ble-telemetry-bot.zip</code> fuer den MeshCore/Web nRF Flasher.</li>
 <li><code>t1000e_companion_radio_ble-telemetry-bot.uf2</code> fuer Drag-and-Drop im DFU-Laufwerk.</li>
+<li><code>t1000e_companion_radio_ble-telemetry-bot-v2.zip</code> als Folgeversion mit Icon-only-Ausgabe, manuellem Versand per Tastendruck und <code>config wo ist X</code>.</li>
+<li><code>t1000e_companion_radio_ble-telemetry-bot-v2.uf2</code> als UF2-Datei dieser Folgeversion.</li>
 </ul>
-<p>Wichtig: Im Web-Flasher die ZIP-Datei verwenden. Die UF2-Datei nur direkt auf das DFU-Laufwerk kopieren.</p>
+<p>Wichtig: Im Web-Flasher die ZIP-Datei verwenden. Die UF2-Datei nur direkt auf das DFU-Laufwerk kopieren. Wer die bisherige Version behalten moechte, nutzt die Dateien ohne <code>-v2</code>; wer die neue Komfort-Version testen moechte, nutzt die Dateien mit <code>-v2</code>.</p>
 <h2 id="flashen">Flashen</h2>
 <h3 id="variante-a-web-flasher">Variante A: Web-Flasher</h3>
 <ol>
 <li>T1000-E in den DFU/Bootloader-Modus bringen.</li>
 <li>MeshCore/Web-Flasher oeffnen.</li>
-<li>Als Custom Firmware die Datei <code>firmware/t1000e_companion_radio_ble-telemetry-bot.zip</code> auswaehlen.</li>
+<li>Als Custom Firmware die passende ZIP auswaehlen, z. B. <code>firmware/t1000e_companion_radio_ble-telemetry-bot-v2.zip</code> fuer die Folgeversion.</li>
 <li>Flashen und den Neustart abwarten.</li>
 </ol>
 <h3 id="variante-b-uf2-per-drag-and-drop">Variante B: UF2 per Drag-and-Drop</h3>
 <ol>
 <li>T1000-E in den DFU/Bootloader-Modus bringen.</li>
 <li>Warten, bis das T1000-E-Laufwerk erscheint.</li>
-<li><code>firmware/t1000e_companion_radio_ble-telemetry-bot.uf2</code> auf dieses Laufwerk kopieren.</li>
+<li>Die passende UF2-Datei auf dieses Laufwerk kopieren, z. B. <code>firmware/t1000e_companion_radio_ble-telemetry-bot-v2.uf2</code> fuer die Folgeversion.</li>
 <li>Neustart abwarten.</li>
 </ol>
 <h2 id="standardverhalten">Standardverhalten</h2>
@@ -1477,11 +1484,16 @@
 <td>Spielt ein Suchsignal am Geraet ab.</td>
 </tr>
 <tr>
+<td><code>config wo ist 3</code></td>
+<td>Spielt das Suchsignal 3-mal ab. Erlaubt sind 1 bis 10 Wiederholungen.</td>
+</tr>
+<tr>
 <td><code>config prefix xy</code></td>
 <td>Aendert das Befehlswort von <code>config</code> auf <code>xy</code>.</td>
 </tr>
 </tbody>
 </table>
+<p>Ein kurzer Tastendruck am T1000-E sendet sofort eine Telemetrie-Nachricht mit der aktuellen Konfiguration. Im Direct-Modus geht sie an das konfigurierte Direct-Ziel, im Flood-Modus in den gesetzten privaten Kanal.</p>
 <p>Nach <code>config prefix xy</code> muessen weitere Befehle mit <code>xy</code> beginnen:</p>
 <pre><code class="language-text">xy help
 xy status
@@ -1491,10 +1503,10 @@ xy label tracker
 <h2 id="beispiele">Beispiele</h2>
 <p>Standardmeldung als private Direktnachricht:</p>
 <pre><code class="language-text">Telemetry:
-🔋 Akku 3.95V
-🌡️ Temp 24.1C
-🗺️ GPS 🛰️ https://maps.google.com/?q=52.123456,13.123456
-💡Licht🔦 42%
+🔋 3.95V
+🌡️ 24.1C
+🗺️🛰️ https://maps.google.com/?q=52.123456,13.123456
+💡🔦 42%
 </code></pre>
 <p>Label und Felder aendern:</p>
 <pre><code class="language-text">config label test
@@ -1502,8 +1514,8 @@ config gps akku
 </code></pre>
 <p>Danach sendet der T1000-E z. B.:</p>
 <pre><code class="language-text">test:
-🔋 Akku 3.95V
-🗺️ GPS 🛰️ https://maps.google.com/?q=52.123456,13.123456
+🔋 3.95V
+🗺️🛰️ https://maps.google.com/?q=52.123456,13.123456
 </code></pre>
 <p>Bewusst in einen privaten Kanal flooden:</p>
 <pre><code class="language-text">config group Robbys_channel
@@ -1517,7 +1529,7 @@ config target me
 </code></pre>
 <p>Geraet stumm schalten, aber trotzdem finden:</p>
 <pre><code class="language-text">config sound off
-config wo ist
+config wo ist 3
 </code></pre>
 <h2 id="build-aus-dem-quellcode">Build aus dem Quellcode</h2>
 <p>PlatformIO installieren und dann das T1000-E BLE Companion Target bauen:</p>
@@ -1567,12 +1579,15 @@ python -m platformio run -e t1000e_companion_radio_ble
 <li>Buzzer mute/unmute by direct message.</li>
 <li>Find-device sound by direct message.</li>
 <li>BLE auto-off after 10 minutes without an app connection.</li>
+<li>Short button press sends one telemetry message with the current configuration.</li>
 </ul>
 <h2 id="firmware-files">Firmware Files</h2>
 <p>Prebuilt firmware artifacts are in the <code>firmware/</code> folder:</p>
 <ul>
 <li><code>t1000e_companion_radio_ble-telemetry-bot.zip</code> for the MeshCore/Web nRF flasher.</li>
 <li><code>t1000e_companion_radio_ble-telemetry-bot.uf2</code> for drag-and-drop flashing in DFU mode.</li>
+<li><code>t1000e_companion_radio_ble-telemetry-bot-v2.zip</code> as the follow-up version with icon-only output, manual button send, and repeated find sound.</li>
+<li><code>t1000e_companion_radio_ble-telemetry-bot-v2.uf2</code> as the UF2 file for that follow-up version.</li>
 </ul>
 <p>Use the ZIP with web flashing. Use the UF2 only when the T1000-E appears as a DFU mass-storage drive.</p>
 <h2 id="flashing">Flashing</h2>
@@ -1696,6 +1711,10 @@ python -m platformio run -e t1000e_companion_radio_ble
 <td>Plays a find-device sound even if normal sound is muted.</td>
 </tr>
 <tr>
+<td><code>config wo ist 3</code></td>
+<td>Plays the find-device sound 3 times. Valid range is 1 to 10.</td>
+</tr>
+<tr>
 <td><code>config prefix xy</code></td>
 <td>Changes the command prefix from <code>config</code> to <code>xy</code>.</td>
 </tr>
@@ -1709,10 +1728,10 @@ xy label tracker
 <h2 id="example-messages">Example Messages</h2>
 <p>With default settings:</p>
 <pre><code class="language-text">Telemetry:
-🔋 Akku 3.95V
-🌡️ Temp 24.1C
-🗺️ GPS 🛰️ https://maps.google.com/?q=52.123456,13.123456
-💡Licht🔦 42%
+🔋 3.95V
+🌡️ 24.1C
+🗺️🛰️ https://maps.google.com/?q=52.123456,13.123456
+💡🔦 42%
 </code></pre>
 <p>After:</p>
 <pre><code class="language-text">config label test
@@ -1720,8 +1739,8 @@ config gps akku
 </code></pre>
 <p>The telemetry message becomes:</p>
 <pre><code class="language-text">test:
-🔋 Akku 3.95V
-🗺️ GPS 🛰️ https://maps.google.com/?q=52.123456,13.123456
+🔋 3.95V
+🗺️🛰️ https://maps.google.com/?q=52.123456,13.123456
 </code></pre>
 <h2 id="build-from-source">Build From Source</h2>
 <p>Install PlatformIO, then build the T1000-E BLE companion target:</p>
