@@ -243,6 +243,10 @@ void DataStore::loadPrefsInt(const char *filename, NodePrefs& _prefs, double& no
     file.read((uint8_t *)&_prefs.telemetry_push_mode, sizeof(_prefs.telemetry_push_mode));                    // 206
     file.read((uint8_t *)_prefs.telemetry_target_pub_key, sizeof(_prefs.telemetry_target_pub_key));            // 207
     file.read((uint8_t *)&_prefs.ble_auto_off, sizeof(_prefs.ble_auto_off));                                  // 239
+    file.read((uint8_t *)&_prefs.alarm_enabled, sizeof(_prefs.alarm_enabled));                                // 240
+    file.read((uint8_t *)&_prefs.alarm_hour, sizeof(_prefs.alarm_hour));                                      // 241
+    file.read((uint8_t *)&_prefs.alarm_minute, sizeof(_prefs.alarm_minute));                                  // 242
+    file.read((uint8_t *)&_prefs.gps_time_sync_interval_mins, sizeof(_prefs.gps_time_sync_interval_mins));    // 243
 
     file.close();
   }
@@ -293,6 +297,10 @@ void DataStore::savePrefs(const NodePrefs& _prefs, double node_lat, double node_
     file.write((uint8_t *)&_prefs.telemetry_push_mode, sizeof(_prefs.telemetry_push_mode));                    // 206
     file.write((uint8_t *)_prefs.telemetry_target_pub_key, sizeof(_prefs.telemetry_target_pub_key));            // 207
     file.write((uint8_t *)&_prefs.ble_auto_off, sizeof(_prefs.ble_auto_off));                                  // 239
+    file.write((uint8_t *)&_prefs.alarm_enabled, sizeof(_prefs.alarm_enabled));                                // 240
+    file.write((uint8_t *)&_prefs.alarm_hour, sizeof(_prefs.alarm_hour));                                      // 241
+    file.write((uint8_t *)&_prefs.alarm_minute, sizeof(_prefs.alarm_minute));                                  // 242
+    file.write((uint8_t *)&_prefs.gps_time_sync_interval_mins, sizeof(_prefs.gps_time_sync_interval_mins));    // 243
 
     file.close();
   }

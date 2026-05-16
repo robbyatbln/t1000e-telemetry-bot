@@ -206,6 +206,13 @@ private:
   bool hasTelemetryTarget() const;
   void setTelemetryTarget(const ContactInfo& contact);
   void checkBlePowerSave();
+  bool parseAlarmTime(const char* text, uint8_t& hour, uint8_t& minute) const;
+  int16_t getLocalUtcOffsetMinutes() const;
+  int16_t getLocalUtcOffsetMinutesFor(uint32_t utc_time) const;
+  bool isEuropeanSummerTime(uint32_t utc_time) const;
+  void requestGpsTimeSync();
+  void checkGpsTimeSync();
+  void checkAlarm();
   bool isValidClientRepeatFreq(uint32_t f) const;
 
   // helpers, short-cuts
@@ -240,7 +247,11 @@ private:
   CayenneLPP telemetry;
   unsigned long next_telemetry_push;
   unsigned long ble_idle_started;
+  unsigned long next_alarm_check;
+  unsigned long next_gps_time_sync;
+  uint32_t last_alarm_local_day;
   bool ble_was_connected;
+  bool gps_time_sync_pending;
 
   struct Frame {
     uint8_t len;

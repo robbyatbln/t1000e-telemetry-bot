@@ -137,6 +137,37 @@ void UITask::playFindSound(uint8_t count) {
 #endif
 }
 
+void UITask::playAlarmSound(uint8_t count) {
+#ifdef PIN_BUZZER
+  if (count == 0) count = 1;
+  if (count > 10) count = 10;
+  bool was_quiet = buzzer.isQuiet();
+  buzzer.quiet(false);
+  for (uint8_t i = 0; i < count; i++) {
+    buzzer.play("alarm:d=8,o=6,b=220:c7,p,c7,p,c7,p,g6,4p,c7,p,c7,p,c7");
+    uint32_t started = millis();
+    while (buzzer.isPlaying() && millis() - started < 6000) {
+      buzzer.loop();
+    }
+    delay(250);
+  }
+  buzzer.quiet(was_quiet);
+#endif
+}
+
+void UITask::playSendOkSound() {
+#ifdef PIN_BUZZER
+  bool was_quiet = buzzer.isQuiet();
+  buzzer.quiet(false);
+  buzzer.play("sent:d=16,o=6,b=220:g,b,g7");
+  uint32_t started = millis();
+  while (buzzer.isPlaying() && millis() - started < 1200) {
+    buzzer.loop();
+  }
+  buzzer.quiet(was_quiet);
+#endif
+}
+
 void UITask::msgRead(int msgcount) {
   _msgcount = msgcount;
   if (msgcount == 0) {
@@ -388,7 +419,7 @@ void UITask::handleButtonShortPress() {
   MESH_DEBUG_PRINTLN("UITask: short press triggered, sending telemetry");
   bool sent = the_mesh.sendTelemetryNow();
   if (sent) {
-    notify(UIEventType::ack);
+    playSendOkSound();
     sprintf(_alert, "Telemetry sent");
   } else {
     sprintf(_alert, "Telemetry failed");

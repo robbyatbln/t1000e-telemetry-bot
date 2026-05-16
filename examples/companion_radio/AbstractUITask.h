@@ -44,5 +44,7 @@ public:
   virtual void notify(UIEventType t = UIEventType::none) = 0;
   virtual void setBuzzerQuiet(bool quiet) { }
   virtual void playFindSound(uint8_t count = 1) { }
+  virtual void playAlarmSound(uint8_t count = 1) { }
+  virtual void playSendOkSound() { notify(UIEventType::ack); }
   virtual void loop() = 0;
 };

@@ -881,7 +881,11 @@ MyMesh::MyMesh(mesh::Radio &radio, mesh::RNG &rng, mesh::RTCClock &rtc, SimpleMe
   dirty_contacts_expiry = 0;
   next_telemetry_push = 0;
   ble_idle_started = 0;
+  next_alarm_check = 0;
+  next_gps_time_sync = 0;
+  last_alarm_local_day = 0;
   ble_was_connected = false;
+  gps_time_sync_pending = false;
   memset(advert_paths, 0, sizeof(advert_paths));
   memset(send_scope.key, 0, sizeof(send_scope.key));
 
@@ -906,6 +910,10 @@ MyMesh::MyMesh(mesh::Radio &radio, mesh::RNG &rng, mesh::RTCClock &rtc, SimpleMe
   _prefs.telemetry_push_mode = TELEMETRY_PUSH_MODE_DIRECT;
   memset(_prefs.telemetry_target_pub_key, 0, sizeof(_prefs.telemetry_target_pub_key));
   _prefs.ble_auto_off = 1;
+  _prefs.alarm_enabled = 0;
+  _prefs.alarm_hour = 0;
+  _prefs.alarm_minute = 0;
+  _prefs.gps_time_sync_interval_mins = 0;
   //_prefs.rx_delay_base = 10.0f;  enable once new algo fixed
 #if defined(USE_SX1262) || defined(USE_SX1268)
 #ifdef SX126X_RX_BOOSTED_GAIN
@@ -974,6 +982,10 @@ void MyMesh::begin(bool has_display) {
   _prefs.telemetry_push_enabled = constrain(_prefs.telemetry_push_enabled, 0, 1);
   _prefs.telemetry_push_mode = constrain(_prefs.telemetry_push_mode, 0, 1);
   _prefs.ble_auto_off = constrain(_prefs.ble_auto_off, 0, 1);
+  _prefs.alarm_enabled = constrain(_prefs.alarm_enabled, 0, 1);
+  _prefs.alarm_hour = constrain(_prefs.alarm_hour, 0, 23);
+  _prefs.alarm_minute = constrain(_prefs.alarm_minute, 0, 59);
+  _prefs.gps_time_sync_interval_mins = constrain(_prefs.gps_time_sync_interval_mins, 0, 1440);
   _prefs.telemetry_push_fields &= TELEMETRY_FIELD_ALL;
   if (_prefs.telemetry_push_fields == 0) _prefs.telemetry_push_fields = TELEMETRY_FIELD_ALL;
   _prefs.telemetry_push_group_name[sizeof(_prefs.telemetry_push_group_name) - 1] = 0;
@@ -2267,6 +2279,69 @@ void MyMesh::setTelemetryTarget(const ContactInfo& contact) {
   memcpy(_prefs.telemetry_target_pub_key, contact.id.pub_key, sizeof(_prefs.telemetry_target_pub_key));
 }
 
+bool MyMesh::parseAlarmTime(const char* text, uint8_t& hour, uint8_t& minute) const {
+  int h = -1;
+  int m = -1;
+  if (sscanf(text, "%d:%d", &h, &m) != 2) return false;
+  if (h < 0 || h > 23 || m < 0 || m > 59) return false;
+  hour = (uint8_t)h;
+  minute = (uint8_t)m;
+  return true;
+}
+
+static uint8_t daysInMonth(uint16_t year, uint8_t month) {
+  static const uint8_t days[] = { 31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31 };
+  if (month == 2 && ((year % 4 == 0 && year % 100 != 0) || (year % 400 == 0))) return 29;
+  return days[month - 1];
+}
+
+static uint8_t lastSundayOfMonth(uint16_t year, uint8_t month) {
+  for (int day = daysInMonth(year, month); day >= 1; day--) {
+    if (DateTime(year, month, day, 0, 0, 0).dayOfTheWeek() == 0) return day;
+  }
+  return 1;
+}
+
+bool MyMesh::isEuropeanSummerTime(uint32_t utc_time) const {
+  DateTime now(utc_time);
+  uint16_t year = now.year();
+  uint32_t dst_start = DateTime(year, 3, lastSundayOfMonth(year, 3), 1, 0, 0).unixtime();
+  uint32_t dst_end = DateTime(year, 10, lastSundayOfMonth(year, 10), 1, 0, 0).unixtime();
+  return utc_time >= dst_start && utc_time < dst_end;
+}
+
+int16_t MyMesh::getLocalUtcOffsetMinutesFor(uint32_t utc_time) const {
+  double lat = sensors.node_lat;
+  double lon = sensors.node_lon;
+
+  if ((lat == 0.0 && lon == 0.0) || (lat >= 34.0 && lat <= 72.0 && lon >= -25.0 && lon <= 45.0)) {
+    return isEuropeanSummerTime(utc_time) ? 120 : 60;
+  }
+
+  int zone = lon >= 0 ? (int)((lon + 7.5) / 15.0) : (int)((lon - 7.5) / 15.0);
+  zone = constrain(zone, -12, 14);
+  return zone * 60;
+}
+
+int16_t MyMesh::getLocalUtcOffsetMinutes() const {
+  return getLocalUtcOffsetMinutesFor(getRTCClock()->getCurrentTime());
+}
+
+void MyMesh::requestGpsTimeSync() {
+  sensors.setSettingValue("gps", "1");
+  auto location = sensors.getLocationProvider();
+  if (location) {
+    location->syncTime();
+    if (location->isValid()) {
+      uint32_t gps_utc = location->getTimestamp();
+      getRTCClock()->setCurrentTime(gps_utc + ((int32_t)getLocalUtcOffsetMinutesFor(gps_utc) * 60));
+      gps_time_sync_pending = false;
+    } else {
+      gps_time_sync_pending = true;
+    }
+  }
+}
+
 void MyMesh::sendTelemetryControlReply(const ContactInfo& to, const char* text) {
   uint32_t expected_ack, est_timeout;
   sendMessage(to, getRTCClock()->getCurrentTime(), 0, text, expected_ack, est_timeout);
@@ -2293,15 +2368,20 @@ bool MyMesh::handleTelemetryControlMessage(const ContactInfo& from, const char* 
     original_body++;
   }
 
-  if (strncmp(body, _prefs.telemetry_command_prefix, strlen(_prefs.telemetry_command_prefix)) != 0) {
+  bool bare_alarm = strncmp(body, "wecker ", 7) == 0 || strcmp(body, "wecker") == 0 ||
+                    strncmp(body, "alarm ", 6) == 0 || strcmp(body, "alarm") == 0;
+
+  if (!bare_alarm && strncmp(body, _prefs.telemetry_command_prefix, strlen(_prefs.telemetry_command_prefix)) != 0) {
     return false;
   }
-  body += strlen(_prefs.telemetry_command_prefix);
-  original_body += strlen(_prefs.telemetry_command_prefix);
-  if (*body && *body != ' ') return false;
-  while (*body == ' ') {
-    body++;
-    original_body++;
+  if (!bare_alarm) {
+    body += strlen(_prefs.telemetry_command_prefix);
+    original_body += strlen(_prefs.telemetry_command_prefix);
+    if (*body && *body != ' ') return false;
+    while (*body == ' ') {
+      body++;
+      original_body++;
+    }
   }
 
   bool recognized = false;
@@ -2310,8 +2390,61 @@ bool MyMesh::handleTelemetryControlMessage(const ContactInfo& from, const char* 
   uint8_t fields = 0;
 
   if (strcmp(body, "help") == 0 || strcmp(body, "?") == 0) {
-    sendTelemetryControlReply(from, "help: start/stop/status, direct/flood, target me, group NAME, scope NAME/off, interval N>=10, gps/akku/temp/licht/all, ble on/off, sound on/off, prefix WORD");
+    sendTelemetryControlReply(from, "help: start/stop/status, direct/flood, target me, wecker HH:MM/aus, timesync once/N/off, group NAME, interval N>=10, ble on/off");
     return true;
+  }
+
+  if (strncmp(body, "wecker ", 7) == 0 || strncmp(body, "alarm ", 6) == 0 || strcmp(body, "wecker") == 0 || strcmp(body, "alarm") == 0) {
+    char* value = body;
+    if (strncmp(body, "wecker ", 7) == 0) value = body + 7;
+    else if (strncmp(body, "alarm ", 6) == 0) value = body + 6;
+    else value = body + strlen(body);
+    while (*value == ' ') value++;
+    if (strcmp(value, "aus") == 0 || strcmp(value, "off") == 0 || strcmp(value, "stop") == 0) {
+      _prefs.alarm_enabled = 0;
+      recognized = true;
+      changed = true;
+    } else {
+      uint8_t h, m;
+      if (parseAlarmTime(value, h, m)) {
+        _prefs.alarm_hour = h;
+        _prefs.alarm_minute = m;
+        _prefs.alarm_enabled = 1;
+        last_alarm_local_day = 0;
+        recognized = true;
+        changed = true;
+      } else if (value[0] == 0 || strcmp(value, "status") == 0) {
+        recognized = true;
+      } else {
+        sendTelemetryControlReply(from, "Nein: Wecker bitte als wecker HH:MM senden, z.B. wecker 15:44");
+        return true;
+      }
+    }
+  }
+
+  if (strncmp(body, "timesync ", 9) == 0 || strncmp(body, "zeitsync ", 9) == 0 || strncmp(body, "uhrzeit ", 8) == 0) {
+    char* value = body + (strncmp(body, "uhrzeit ", 8) == 0 ? 8 : 9);
+    while (*value == ' ') value++;
+    if (strncmp(value, "sync ", 5) == 0) {
+      value += 5;
+      while (*value == ' ') value++;
+    }
+    if (strcmp(value, "once") == 0 || strcmp(value, "einmal") == 0 || strcmp(value, "jetzt") == 0 || strcmp(value, "now") == 0) {
+      requestGpsTimeSync();
+      recognized = true;
+    } else if (strcmp(value, "off") == 0 || strcmp(value, "aus") == 0) {
+      _prefs.gps_time_sync_interval_mins = 0;
+      recognized = true;
+      changed = true;
+    } else {
+      int mins = atoi(value);
+      if (mins > 0) {
+        _prefs.gps_time_sync_interval_mins = constrain(mins, 1, 1440);
+        next_gps_time_sync = futureMillis(1000);
+        recognized = true;
+        changed = true;
+      }
+    }
   }
 
   if (strncmp(body, "prefix ", 7) == 0) {
@@ -2510,14 +2643,16 @@ bool MyMesh::handleTelemetryControlMessage(const ContactInfo& from, const char* 
   }
 
   char reply[160];
-  snprintf(reply, sizeof(reply), "OK: %s %s, %s, %u min, Ton %s, BLE %s\n%s%s%s%s",
+  snprintf(reply, sizeof(reply), "OK: %s %s, %s, %u min, W %s%02u:%02u, TS %u\n%s%s%s%s",
            _prefs.telemetry_push_label,
            _prefs.telemetry_push_enabled ? "AN" : "AUS",
            _prefs.telemetry_push_mode == TELEMETRY_PUSH_MODE_DIRECT ? "Direct" :
              (_prefs.telemetry_push_group_name[0] ? _prefs.telemetry_push_group_name : "Flood"),
            _prefs.telemetry_push_interval_mins,
-           _prefs.buzzer_quiet ? "aus" : "an",
-           (_serial && _serial->isEnabled()) ? (_prefs.ble_auto_off ? "auto" : "an") : "aus",
+           _prefs.alarm_enabled ? "" : "aus ",
+           _prefs.alarm_hour,
+           _prefs.alarm_minute,
+           _prefs.gps_time_sync_interval_mins,
            (_prefs.telemetry_push_fields & TELEMETRY_FIELD_BATT) ? "🔋 " : "",
            (_prefs.telemetry_push_fields & TELEMETRY_FIELD_TEMP) ? "🌡️ " : "",
            (_prefs.telemetry_push_fields & TELEMETRY_FIELD_GPS) ? "🗺️🛰️ " : "",
@@ -2622,6 +2757,44 @@ void MyMesh::checkTelemetryPush() {
   }
 }
 
+void MyMesh::checkGpsTimeSync() {
+  auto location = sensors.getLocationProvider();
+  if (gps_time_sync_pending && location && location->isValid()) {
+    uint32_t gps_utc = location->getTimestamp();
+    getRTCClock()->setCurrentTime(gps_utc + ((int32_t)getLocalUtcOffsetMinutesFor(gps_utc) * 60));
+    gps_time_sync_pending = false;
+  }
+
+  if (_prefs.gps_time_sync_interval_mins == 0) return;
+
+  if (next_gps_time_sync == 0) {
+    next_gps_time_sync = futureMillis(10000);
+    return;
+  }
+
+  if (millisHasNowPassed(next_gps_time_sync)) {
+    requestGpsTimeSync();
+    next_gps_time_sync = futureMillis(((uint32_t)_prefs.gps_time_sync_interval_mins) * 60 * 1000);
+  }
+}
+
+void MyMesh::checkAlarm() {
+  if (!_prefs.alarm_enabled) return;
+
+  if (next_alarm_check && !millisHasNowPassed(next_alarm_check)) return;
+  next_alarm_check = futureMillis(1000);
+
+  uint32_t local_now = getRTCClock()->getCurrentTime();
+  DateTime local_dt(local_now);
+  uint32_t local_day = local_now / 86400UL;
+
+  if (local_dt.hour() == _prefs.alarm_hour && local_dt.minute() == _prefs.alarm_minute &&
+      local_day != last_alarm_local_day) {
+    last_alarm_local_day = local_day;
+    if (_ui) _ui->playAlarmSound(3);
+  }
+}
+
 void MyMesh::checkBlePowerSave() {
   if (!_serial || !_prefs.ble_auto_off || !_serial->isEnabled()) return;
 
@@ -2660,6 +2833,8 @@ void MyMesh::loop() {
   }
 
   checkTelemetryPush();
+  checkGpsTimeSync();
+  checkAlarm();
   checkBlePowerSave();
 
 #ifdef DISPLAY_CLASS

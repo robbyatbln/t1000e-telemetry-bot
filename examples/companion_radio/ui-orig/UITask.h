@@ -69,6 +69,8 @@ public:
   void notify(UIEventType t = UIEventType::none) override;
   void setBuzzerQuiet(bool quiet) override;
   void playFindSound(uint8_t count = 1) override;
+  void playAlarmSound(uint8_t count = 1) override;
+  void playSendOkSound() override;
   void loop() override;
 
   void shutdown(bool restart = false);

@@ -47,4 +47,8 @@ struct NodePrefs {  // persisted to file
   uint8_t telemetry_push_mode;           // TELEMETRY_PUSH_MODE_*
   uint8_t telemetry_target_pub_key[32];  // direct recipient for private periodic telemetry
   uint8_t ble_auto_off;                  // disable BLE advertising after idle timeout
+  uint8_t alarm_enabled;                 // local alarm enabled
+  uint8_t alarm_hour;                    // local alarm hour
+  uint8_t alarm_minute;                  // local alarm minute
+  uint16_t gps_time_sync_interval_mins;  // 0=off, otherwise request GPS time sync every N minutes
 };
