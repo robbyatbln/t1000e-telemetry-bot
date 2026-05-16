@@ -12,6 +12,7 @@
   - `config timesync aus`
 - Erfolgreicher manueller Versand per Taste bekommt einen kurzen eigenen Quittungston.
 - Alarm, Suchton und Versandquittung verwenden unterschiedliche Tonfolgen.
+- Wenn der Wecker klingelt, stoppt ein kurzer Tastendruck den Alarm lokal.
 - Firmware-Dateien:
   - `firmware/t1000e_companion_radio_ble-telemetry-bot-v3.zip`
   - `firmware/t1000e_companion_radio_ble-telemetry-bot-v3.uf2`

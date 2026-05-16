@@ -45,6 +45,8 @@ public:
   virtual void setBuzzerQuiet(bool quiet) { }
   virtual void playFindSound(uint8_t count = 1) { }
   virtual void playAlarmSound(uint8_t count = 1) { }
+  virtual bool isAlarmSoundPlaying() const { return false; }
+  virtual void stopAlarmSound() { }
   virtual void playSendOkSound() { notify(UIEventType::ack); }
   virtual void loop() = 0;
 };

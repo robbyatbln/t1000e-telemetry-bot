@@ -141,17 +141,32 @@ void UITask::playAlarmSound(uint8_t count) {
 #ifdef PIN_BUZZER
   if (count == 0) count = 1;
   if (count > 10) count = 10;
-  bool was_quiet = buzzer.isQuiet();
+  _alarmWasQuiet = buzzer.isQuiet();
+  _alarmRemaining = count;
+  _alarmPlaying = true;
+  _nextAlarmRepeat = 0;
   buzzer.quiet(false);
-  for (uint8_t i = 0; i < count; i++) {
-    buzzer.play("alarm:d=8,o=6,b=220:c7,p,c7,p,c7,p,g6,4p,c7,p,c7,p,c7");
-    uint32_t started = millis();
-    while (buzzer.isPlaying() && millis() - started < 6000) {
-      buzzer.loop();
-    }
-    delay(250);
-  }
-  buzzer.quiet(was_quiet);
+  buzzer.play("alarm:d=8,o=6,b=220:c7,p,c7,p,c7,p,g6,4p,c7,p,c7,p,c7");
+  _alarmRemaining--;
+#endif
+}
+
+bool UITask::isAlarmSoundPlaying() const {
+#ifdef PIN_BUZZER
+  return _alarmPlaying;
+#else
+  return false;
+#endif
+}
+
+void UITask::stopAlarmSound() {
+#ifdef PIN_BUZZER
+  if (!_alarmPlaying) return;
+  buzzer.stop();
+  buzzer.quiet(_alarmWasQuiet);
+  _alarmPlaying = false;
+  _alarmRemaining = 0;
+  _nextAlarmRepeat = 0;
 #endif
 }
 
@@ -381,6 +396,19 @@ void UITask::loop() {
 
 #ifdef PIN_BUZZER
   if (buzzer.isPlaying())  buzzer.loop();
+  if (_alarmPlaying && !buzzer.isPlaying()) {
+    if (_alarmRemaining > 0) {
+      if (_nextAlarmRepeat == 0) _nextAlarmRepeat = millis() + 250;
+      if (millis() >= _nextAlarmRepeat) {
+        buzzer.play("alarm:d=8,o=6,b=220:c7,p,c7,p,c7,p,g6,4p,c7,p,c7,p,c7");
+        _alarmRemaining--;
+        _nextAlarmRepeat = 0;
+      }
+    } else {
+      buzzer.quiet(_alarmWasQuiet);
+      _alarmPlaying = false;
+    }
+  }
 #endif
 
   if (_display != NULL && _display->isOn()) {
@@ -416,6 +444,14 @@ void UITask::handleButtonAnyPress() {
 }
 
 void UITask::handleButtonShortPress() {
+  if (isAlarmSoundPlaying()) {
+    MESH_DEBUG_PRINTLN("UITask: short press triggered, stopping alarm");
+    stopAlarmSound();
+    sprintf(_alert, "Alarm stopped");
+    _need_refresh = true;
+    return;
+  }
+
   MESH_DEBUG_PRINTLN("UITask: short press triggered, sending telemetry");
   bool sent = the_mesh.sendTelemetryNow();
   if (sent) {

@@ -30,6 +30,10 @@ class UITask : public AbstractUITask {
   bool _need_refresh = true;
   bool _displayWasOn = false;  // Track display state before button press
   unsigned long ui_started_at;
+  bool _alarmPlaying = false;
+  bool _alarmWasQuiet = false;
+  uint8_t _alarmRemaining = 0;
+  unsigned long _nextAlarmRepeat = 0;
 
   // Button handlers
 #ifdef PIN_USER_BTN
@@ -70,6 +74,8 @@ public:
   void setBuzzerQuiet(bool quiet) override;
   void playFindSound(uint8_t count = 1) override;
   void playAlarmSound(uint8_t count = 1) override;
+  bool isAlarmSoundPlaying() const override;
+  void stopAlarmSound() override;
   void playSendOkSound() override;
   void loop() override;
 
