@@ -68,7 +68,7 @@ public:
   void newMsg(uint8_t path_len, const char* from_name, const char* text, int msgcount) override;
   void notify(UIEventType t = UIEventType::none) override;
   void setBuzzerQuiet(bool quiet) override;
-  void playFindSound() override;
+  void playFindSound(uint8_t count = 1) override;
   void loop() override;
 
   void shutdown(bool restart = false);

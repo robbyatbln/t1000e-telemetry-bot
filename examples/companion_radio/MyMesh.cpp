@@ -2442,9 +2442,20 @@ bool MyMesh::handleTelemetryControlMessage(const ContactInfo& from, const char* 
       changed = true;
     }
   }
-  if (strcmp(body, "wo ist") == 0 || strcmp(body, "woist") == 0 ||
-      strcmp(body, "find") == 0 || strcmp(body, "find me") == 0) {
-    if (_ui) _ui->playFindSound();
+  if (strcmp(body, "wo ist") == 0 || strncmp(body, "wo ist ", 7) == 0 ||
+      strcmp(body, "woist") == 0 || strncmp(body, "woist ", 6) == 0 ||
+      strcmp(body, "find") == 0 || strncmp(body, "find ", 5) == 0 ||
+      strcmp(body, "find me") == 0) {
+    uint8_t count = 1;
+    const char* count_text = NULL;
+    if (strncmp(body, "wo ist ", 7) == 0) count_text = body + 7;
+    else if (strncmp(body, "woist ", 6) == 0) count_text = body + 6;
+    else if (strncmp(body, "find ", 5) == 0) count_text = body + 5;
+    if (count_text) {
+      int requested = atoi(count_text);
+      if (requested > 0) count = constrain(requested, 1, 10);
+    }
+    if (_ui) _ui->playFindSound(count);
     recognized = true;
   }
   if (strstr(body, "start")) {
@@ -2507,12 +2518,16 @@ bool MyMesh::handleTelemetryControlMessage(const ContactInfo& from, const char* 
            _prefs.telemetry_push_interval_mins,
            _prefs.buzzer_quiet ? "aus" : "an",
            (_serial && _serial->isEnabled()) ? (_prefs.ble_auto_off ? "auto" : "an") : "aus",
-           (_prefs.telemetry_push_fields & TELEMETRY_FIELD_BATT) ? "🔋 Akku " : "",
-           (_prefs.telemetry_push_fields & TELEMETRY_FIELD_TEMP) ? "🌡️ Temp " : "",
-           (_prefs.telemetry_push_fields & TELEMETRY_FIELD_GPS) ? "🗺️ GPS 🛰️ " : "",
-           (_prefs.telemetry_push_fields & TELEMETRY_FIELD_LIGHT) ? "💡Licht🔦" : "");
+           (_prefs.telemetry_push_fields & TELEMETRY_FIELD_BATT) ? "🔋 " : "",
+           (_prefs.telemetry_push_fields & TELEMETRY_FIELD_TEMP) ? "🌡️ " : "",
+           (_prefs.telemetry_push_fields & TELEMETRY_FIELD_GPS) ? "🗺️🛰️ " : "",
+           (_prefs.telemetry_push_fields & TELEMETRY_FIELD_LIGHT) ? "💡🔦" : "");
   sendTelemetryControlReply(from, reply);
   return true;
+}
+
+bool MyMesh::sendTelemetryNow() {
+  return sendTelemetryPush();
 }
 
 bool MyMesh::sendTelemetryPush() {
@@ -2529,17 +2544,17 @@ bool MyMesh::sendTelemetryPush() {
 
   pos += snprintf(&text[pos], sizeof(text) - pos, "%s:", _prefs.telemetry_push_label);
   if (_prefs.telemetry_push_fields & TELEMETRY_FIELD_BATT) {
-    pos += snprintf(&text[pos], sizeof(text) - pos, "\n🔋 Akku %.2fV", batt_mv / 1000.0f);
+    pos += snprintf(&text[pos], sizeof(text) - pos, "\n🔋 %.2fV", batt_mv / 1000.0f);
   }
   if (_prefs.telemetry_push_fields & TELEMETRY_FIELD_TEMP) {
-    pos += snprintf(&text[pos], sizeof(text) - pos, "\n🌡️ Temp %.1fC", temp_c);
+    pos += snprintf(&text[pos], sizeof(text) - pos, "\n🌡️ %.1fC", temp_c);
   }
   if (_prefs.telemetry_push_fields & TELEMETRY_FIELD_GPS) {
-    pos += snprintf(&text[pos], sizeof(text) - pos, "\n🗺️ GPS 🛰️ https://maps.google.com/?q=%.6f,%.6f",
+    pos += snprintf(&text[pos], sizeof(text) - pos, "\n🗺️🛰️ https://maps.google.com/?q=%.6f,%.6f",
                     sensors.node_lat, sensors.node_lon);
   }
   if (_prefs.telemetry_push_fields & TELEMETRY_FIELD_LIGHT) {
-    pos += snprintf(&text[pos], sizeof(text) - pos, "\n💡Licht🔦 %lu%%", (unsigned long)light);
+    pos += snprintf(&text[pos], sizeof(text) - pos, "\n💡🔦 %lu%%", (unsigned long)light);
   }
 
   if (_prefs.telemetry_push_mode == TELEMETRY_PUSH_MODE_FLOOD) {

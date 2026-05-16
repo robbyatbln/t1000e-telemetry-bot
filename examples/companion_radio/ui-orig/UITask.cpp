@@ -119,14 +119,19 @@ void UITask::setBuzzerQuiet(bool quiet) {
 #endif
 }
 
-void UITask::playFindSound() {
+void UITask::playFindSound(uint8_t count) {
 #ifdef PIN_BUZZER
+  if (count == 0) count = 1;
+  if (count > 10) count = 10;
   bool was_quiet = buzzer.isQuiet();
   buzzer.quiet(false);
-  buzzer.play("findme:d=8,o=6,b=180:c,e,g,c7,g,e,c,4p,c,e,g,c7,g,e,c");
-  uint32_t started = millis();
-  while (buzzer.isPlaying() && millis() - started < 5000) {
-    buzzer.loop();
+  for (uint8_t i = 0; i < count; i++) {
+    buzzer.play("findme:d=8,o=6,b=180:c,e,g,c7,g,e,c,4p,c,e,g,c7,g,e,c");
+    uint32_t started = millis();
+    while (buzzer.isPlaying() && millis() - started < 5000) {
+      buzzer.loop();
+    }
+    delay(150);
   }
   buzzer.quiet(was_quiet);
 #endif
@@ -380,7 +385,14 @@ void UITask::handleButtonAnyPress() {
 }
 
 void UITask::handleButtonShortPress() {
-  MESH_DEBUG_PRINTLN("UITask: short press triggered");
+  MESH_DEBUG_PRINTLN("UITask: short press triggered, sending telemetry");
+  bool sent = the_mesh.sendTelemetryNow();
+  if (sent) {
+    notify(UIEventType::ack);
+    sprintf(_alert, "Telemetry sent");
+  } else {
+    sprintf(_alert, "Telemetry failed");
+  }
   if (_display != NULL) {
     // Only clear message preview if display was already on before button press
     if (_displayWasOn) {

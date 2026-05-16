@@ -21,6 +21,7 @@ Die Firmware bleibt grundsaetzlich eine normale MeshCore Companion Firmware: Ver
 | Suchton | Standard-Buzzer-Sounds je nach UI/Build. | `config wo ist` spielt ein Suchsignal am Geraet. |
 | Tonsteuerung | Buzzer kann lokal/UI-abhaengig gesteuert werden. | `config sound off` und `config sound on` per Direktnachricht. |
 | Bluetooth | BLE bleibt normalerweise fuer die App verfuegbar. | BLE kann nach 10 Minuten ohne Verbindung automatisch abschalten und per Direktnachricht wieder eingeschaltet werden. |
+| Taste | Standard-UI-Funktionen je nach Build. | Einmaliges Druecken sendet sofort eine Telemetrie-Nachricht mit der aktuellen Konfiguration. |
 
 ## Wofuer ist diese Firmware gedacht?
 
@@ -37,8 +38,10 @@ Im Ordner `firmware/` liegen zwei Dateien:
 
 - `t1000e_companion_radio_ble-telemetry-bot.zip` fuer den MeshCore/Web nRF Flasher.
 - `t1000e_companion_radio_ble-telemetry-bot.uf2` fuer Drag-and-Drop im DFU-Laufwerk.
+- `t1000e_companion_radio_ble-telemetry-bot-v2.zip` als Folgeversion mit Icon-only-Ausgabe, manuellem Versand per Tastendruck und `config wo ist X`.
+- `t1000e_companion_radio_ble-telemetry-bot-v2.uf2` als UF2-Datei dieser Folgeversion.
 
-Wichtig: Im Web-Flasher die ZIP-Datei verwenden. Die UF2-Datei nur direkt auf das DFU-Laufwerk kopieren.
+Wichtig: Im Web-Flasher die ZIP-Datei verwenden. Die UF2-Datei nur direkt auf das DFU-Laufwerk kopieren. Wer die bisherige Version behalten moechte, nutzt die Dateien ohne `-v2`; wer die neue Komfort-Version testen moechte, nutzt die Dateien mit `-v2`.
 
 ## Flashen
 
@@ -46,14 +49,14 @@ Wichtig: Im Web-Flasher die ZIP-Datei verwenden. Die UF2-Datei nur direkt auf da
 
 1. T1000-E in den DFU/Bootloader-Modus bringen.
 2. MeshCore/Web-Flasher oeffnen.
-3. Als Custom Firmware die Datei `firmware/t1000e_companion_radio_ble-telemetry-bot.zip` auswaehlen.
+3. Als Custom Firmware die passende ZIP auswaehlen, z. B. `firmware/t1000e_companion_radio_ble-telemetry-bot-v2.zip` fuer die Folgeversion.
 4. Flashen und den Neustart abwarten.
 
 ### Variante B: UF2 per Drag-and-Drop
 
 1. T1000-E in den DFU/Bootloader-Modus bringen.
 2. Warten, bis das T1000-E-Laufwerk erscheint.
-3. `firmware/t1000e_companion_radio_ble-telemetry-bot.uf2` auf dieses Laufwerk kopieren.
+3. Die passende UF2-Datei auf dieses Laufwerk kopieren, z. B. `firmware/t1000e_companion_radio_ble-telemetry-bot-v2.uf2` fuer die Folgeversion.
 4. Neustart abwarten.
 
 ## Standardverhalten
@@ -96,7 +99,10 @@ Alle Befehle werden als Direktnachricht an den T1000-E gesendet. Jeder erkannte 
 | `config sound off` | Deaktiviert normale Tonsignale. |
 | `config sound on` | Aktiviert normale Tonsignale. |
 | `config wo ist` | Spielt ein Suchsignal am Geraet ab. |
+| `config wo ist 3` | Spielt das Suchsignal 3-mal ab. Erlaubt sind 1 bis 10 Wiederholungen. |
 | `config prefix xy` | Aendert das Befehlswort von `config` auf `xy`. |
+
+Ein kurzer Tastendruck am T1000-E sendet sofort eine Telemetrie-Nachricht mit der aktuellen Konfiguration. Im Direct-Modus geht sie an das konfigurierte Direct-Ziel, im Flood-Modus in den gesetzten privaten Kanal.
 
 Nach `config prefix xy` muessen weitere Befehle mit `xy` beginnen:
 
@@ -113,10 +119,10 @@ Standardmeldung als private Direktnachricht:
 
 ```text
 Telemetry:
-🔋 Akku 3.95V
-🌡️ Temp 24.1C
-🗺️ GPS 🛰️ https://maps.google.com/?q=52.123456,13.123456
-💡Licht🔦 42%
+🔋 3.95V
+🌡️ 24.1C
+🗺️🛰️ https://maps.google.com/?q=52.123456,13.123456
+💡🔦 42%
 ```
 
 Label und Felder aendern:
@@ -130,8 +136,8 @@ Danach sendet der T1000-E z. B.:
 
 ```text
 test:
-🔋 Akku 3.95V
-🗺️ GPS 🛰️ https://maps.google.com/?q=52.123456,13.123456
+🔋 3.95V
+🗺️🛰️ https://maps.google.com/?q=52.123456,13.123456
 ```
 
 Bewusst in einen privaten Kanal flooden:
@@ -154,7 +160,7 @@ Geraet stumm schalten, aber trotzdem finden:
 
 ```text
 config sound off
-config wo ist
+config wo ist 3
 ```
 
 ## Build aus dem Quellcode
@@ -219,6 +225,7 @@ The firmware periodically sends selected telemetry fields by private direct mess
 - Buzzer mute/unmute by direct message.
 - Find-device sound by direct message.
 - BLE auto-off after 10 minutes without an app connection.
+- Short button press sends one telemetry message with the current configuration.
 
 ## Firmware Files
 
@@ -226,6 +233,8 @@ Prebuilt firmware artifacts are in the `firmware/` folder:
 
 - `t1000e_companion_radio_ble-telemetry-bot.zip` for the MeshCore/Web nRF flasher.
 - `t1000e_companion_radio_ble-telemetry-bot.uf2` for drag-and-drop flashing in DFU mode.
+- `t1000e_companion_radio_ble-telemetry-bot-v2.zip` as the follow-up version with icon-only output, manual button send, and repeated find sound.
+- `t1000e_companion_radio_ble-telemetry-bot-v2.uf2` as the UF2 file for that follow-up version.
 
 Use the ZIP with web flashing. Use the UF2 only when the T1000-E appears as a DFU mass-storage drive.
 
@@ -285,6 +294,7 @@ Send these as direct messages to the T1000-E node.
 | `config sound off` | Mutes normal buzzer notifications. |
 | `config sound on` | Enables normal buzzer notifications. |
 | `config wo ist` | Plays a find-device sound even if normal sound is muted. |
+| `config wo ist 3` | Plays the find-device sound 3 times. Valid range is 1 to 10. |
 | `config prefix xy` | Changes the command prefix from `config` to `xy`. |
 
 After changing the prefix, commands must use the new prefix, for example:
@@ -301,10 +311,10 @@ With default settings:
 
 ```text
 Telemetry:
-🔋 Akku 3.95V
-🌡️ Temp 24.1C
-🗺️ GPS 🛰️ https://maps.google.com/?q=52.123456,13.123456
-💡Licht🔦 42%
+🔋 3.95V
+🌡️ 24.1C
+🗺️🛰️ https://maps.google.com/?q=52.123456,13.123456
+💡🔦 42%
 ```
 
 After:
@@ -318,8 +328,8 @@ The telemetry message becomes:
 
 ```text
 test:
-🔋 Akku 3.95V
-🗺️ GPS 🛰️ https://maps.google.com/?q=52.123456,13.123456
+🔋 3.95V
+🗺️🛰️ https://maps.google.com/?q=52.123456,13.123456
 ```
 
 ## Build From Source
