@@ -998,6 +998,9 @@ void MyMesh::begin(bool has_display) {
                        sizeof(_prefs.telemetry_push_group_name));
   }
   scheduleTelemetryPush();
+  if (_prefs.telemetry_push_enabled && _prefs.telemetry_push_interval_mins > 0) {
+    next_telemetry_push = futureMillis(3000);
+  }
 
 #ifdef BLE_PIN_CODE // 123456 by default
   if (_prefs.ble_pin == 0) {
@@ -2643,12 +2646,16 @@ bool MyMesh::handleTelemetryControlMessage(const ContactInfo& from, const char* 
   }
 
   char reply[160];
-  snprintf(reply, sizeof(reply), "OK: %s %s, %s, %u min, W %s%02u:%02u, TS %u\n%s%s%s%s",
+  DateTime status_time(getRTCClock()->getCurrentTime());
+  snprintf(reply, sizeof(reply), "OK %s %s %s %um\nZeit %02u:%02u:%02u W %s%02u:%02u TS %u\n%s%s%s%s",
            _prefs.telemetry_push_label,
            _prefs.telemetry_push_enabled ? "AN" : "AUS",
            _prefs.telemetry_push_mode == TELEMETRY_PUSH_MODE_DIRECT ? "Direct" :
              (_prefs.telemetry_push_group_name[0] ? _prefs.telemetry_push_group_name : "Flood"),
            _prefs.telemetry_push_interval_mins,
+           status_time.hour(),
+           status_time.minute(),
+           status_time.second(),
            _prefs.alarm_enabled ? "" : "aus ",
            _prefs.alarm_hour,
            _prefs.alarm_minute,

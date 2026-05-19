@@ -1,5 +1,13 @@
 # Changelog
 
+## v4-status-time-boot-send
+
+- `config status` und andere bestaetigte Konfigurationsbefehle zeigen jetzt die aktuelle Tracker-Uhrzeit als `Zeit HH:MM:SS`.
+- Wenn Telemetrie aktiviert ist, startet der Tracker nach dem Einschalten automatisch nach wenigen Sekunden mit der ersten Uebertragung.
+- Firmware-Dateien:
+  - `firmware/t1000e_companion_radio_ble-telemetry-bot-v4.zip`
+  - `firmware/t1000e_companion_radio_ble-telemetry-bot-v4.uf2`
+
 ## v3-alarm-time-sync
 
 - Fuegt einen lokalen Wecker hinzu: `wecker 15:44` oder `config wecker 15:44`.
