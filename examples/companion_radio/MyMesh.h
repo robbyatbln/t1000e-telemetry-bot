@@ -201,7 +201,7 @@ private:
   bool sendTelemetryPushDirect(const char* text);
   bool sendTelemetryPushFlood(const char* text);
   bool sendSelfAdvertZeroHop();
-  bool handleTelemetryControlMessage(const ContactInfo& from, const char* text);
+  bool handleTelemetryControlMessage(const ContactInfo& from, uint32_t sender_timestamp, const char* text);
   void sendTelemetryControlReply(const ContactInfo& to, const char* text);
   bool hasTelemetryTarget() const;
   void setTelemetryTarget(const ContactInfo& contact);
@@ -252,6 +252,7 @@ private:
   uint32_t last_alarm_local_day;
   bool ble_was_connected;
   bool gps_time_sync_pending;
+  bool gps_time_sync_boot_done;
 
   struct Frame {
     uint8_t len;

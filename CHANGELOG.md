@@ -1,5 +1,14 @@
 # Changelog
 
+## v6-clock-sync-command-fix
+
+- Korrigiert die Tracker-Uhr bei eingehenden Direct-Kommandos anhand des Nachrichtenzeitstempels der App.
+- `sync`, `time sync`, `config sync` und `config time sync` starten jetzt einen GPS-Zeitabgleich.
+- Beim Start versucht die Firmware einmalig nach ca. 10 Sekunden einen GPS-Zeitabgleich.
+- Firmware-Dateien:
+  - `firmware/t1000e_companion_radio_ble-telemetry-bot-v6.zip`
+  - `firmware/t1000e_companion_radio_ble-telemetry-bot-v6.uf2`
+
 ## v5-timezone-dst-fix
 
 - Korrigiert die Europa-Sommerzeit-Erkennung fuer den GPS-Zeitsync, damit Deutschland/Berlin im Sommer auf `UTC+2` statt `UTC+1` laeuft.
