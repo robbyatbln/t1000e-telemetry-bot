@@ -2308,9 +2308,22 @@ static uint8_t lastSundayOfMonth(uint16_t year, uint8_t month) {
 bool MyMesh::isEuropeanSummerTime(uint32_t utc_time) const {
   DateTime now(utc_time);
   uint16_t year = now.year();
-  uint32_t dst_start = DateTime(year, 3, lastSundayOfMonth(year, 3), 1, 0, 0).unixtime();
-  uint32_t dst_end = DateTime(year, 10, lastSundayOfMonth(year, 10), 1, 0, 0).unixtime();
-  return utc_time >= dst_start && utc_time < dst_end;
+  uint8_t month = now.month();
+  if (month < 3 || month > 10) return false;
+  if (month > 3 && month < 10) return true;
+
+  uint8_t day = now.day();
+  uint8_t hour = now.hour();
+  uint8_t last_sunday = lastSundayOfMonth(year, month);
+  if (month == 3) {
+    if (day > last_sunday) return true;
+    if (day < last_sunday) return false;
+    return hour >= 1;
+  }
+
+  if (day < last_sunday) return true;
+  if (day > last_sunday) return false;
+  return hour < 1;
 }
 
 int16_t MyMesh::getLocalUtcOffsetMinutesFor(uint32_t utc_time) const {
@@ -2647,7 +2660,8 @@ bool MyMesh::handleTelemetryControlMessage(const ContactInfo& from, const char* 
 
   char reply[160];
   DateTime status_time(getRTCClock()->getCurrentTime());
-  snprintf(reply, sizeof(reply), "OK %s %s %s %um\nZeit %02u:%02u:%02u W %s%02u:%02u TS %u\n%s%s%s%s",
+  int16_t status_offset = getLocalUtcOffsetMinutesFor(getRTCClock()->getCurrentTime());
+  snprintf(reply, sizeof(reply), "OK %s %s %s %um\nZeit %02u:%02u:%02u UTC%+d W %s%02u:%02u TS %u\n%s%s%s%s",
            _prefs.telemetry_push_label,
            _prefs.telemetry_push_enabled ? "AN" : "AUS",
            _prefs.telemetry_push_mode == TELEMETRY_PUSH_MODE_DIRECT ? "Direct" :
@@ -2656,6 +2670,7 @@ bool MyMesh::handleTelemetryControlMessage(const ContactInfo& from, const char* 
            status_time.hour(),
            status_time.minute(),
            status_time.second(),
+           status_offset / 60,
            _prefs.alarm_enabled ? "" : "aus ",
            _prefs.alarm_hour,
            _prefs.alarm_minute,

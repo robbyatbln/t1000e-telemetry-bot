@@ -1,5 +1,13 @@
 # Changelog
 
+## v5-timezone-dst-fix
+
+- Korrigiert die Europa-Sommerzeit-Erkennung fuer den GPS-Zeitsync, damit Deutschland/Berlin im Sommer auf `UTC+2` statt `UTC+1` laeuft.
+- `config status` zeigt zusaetzlich den erkannten UTC-Versatz, z. B. `UTC+2`.
+- Firmware-Dateien:
+  - `firmware/t1000e_companion_radio_ble-telemetry-bot-v5.zip`
+  - `firmware/t1000e_companion_radio_ble-telemetry-bot-v5.uf2`
+
 ## v4-status-time-boot-send
 
 - `config status` und andere bestaetigte Konfigurationsbefehle zeigen jetzt die aktuelle Tracker-Uhrzeit als `Zeit HH:MM:SS`.

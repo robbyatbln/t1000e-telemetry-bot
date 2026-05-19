@@ -44,6 +44,8 @@ Im Ordner `firmware/` liegen zwei Dateien:
 - `t1000e_companion_radio_ble-telemetry-bot-v3.uf2` als UF2-Datei dieser Folgeversion.
 - `t1000e_companion_radio_ble-telemetry-bot-v4.zip` als Folgeversion mit Uhrzeit in der Statusantwort und automatischer erster Uebertragung nach dem Einschalten.
 - `t1000e_companion_radio_ble-telemetry-bot-v4.uf2` als UF2-Datei dieser Folgeversion.
+- `t1000e_companion_radio_ble-telemetry-bot-v5.zip` als Folgeversion mit korrigierter Europa-Sommerzeit und sichtbarem UTC-Versatz in `config status`.
+- `t1000e_companion_radio_ble-telemetry-bot-v5.uf2` als UF2-Datei dieser Folgeversion.
 
 Wichtig: Im Web-Flasher die ZIP-Datei verwenden. Die UF2-Datei nur direkt auf das DFU-Laufwerk kopieren. Wer die bisherige Version behalten moechte, nutzt die Dateien ohne Versionssuffix; wer neue Funktionen testen moechte, nutzt die passende Folgeversion mit `-v2`, `-v3` usw.
 
@@ -53,14 +55,14 @@ Wichtig: Im Web-Flasher die ZIP-Datei verwenden. Die UF2-Datei nur direkt auf da
 
 1. T1000-E in den DFU/Bootloader-Modus bringen.
 2. MeshCore/Web-Flasher oeffnen.
-3. Als Custom Firmware die passende ZIP auswaehlen, z. B. `firmware/t1000e_companion_radio_ble-telemetry-bot-v4.zip` fuer die aktuelle Folgeversion.
+3. Als Custom Firmware die passende ZIP auswaehlen, z. B. `firmware/t1000e_companion_radio_ble-telemetry-bot-v5.zip` fuer die aktuelle Folgeversion.
 4. Flashen und den Neustart abwarten.
 
 ### Variante B: UF2 per Drag-and-Drop
 
 1. T1000-E in den DFU/Bootloader-Modus bringen.
 2. Warten, bis das T1000-E-Laufwerk erscheint.
-3. Die passende UF2-Datei auf dieses Laufwerk kopieren, z. B. `firmware/t1000e_companion_radio_ble-telemetry-bot-v4.uf2` fuer die aktuelle Folgeversion.
+3. Die passende UF2-Datei auf dieses Laufwerk kopieren, z. B. `firmware/t1000e_companion_radio_ble-telemetry-bot-v5.uf2` fuer die aktuelle Folgeversion.
 4. Neustart abwarten.
 
 ## Standardverhalten
@@ -84,7 +86,7 @@ Alle Befehle werden als Direktnachricht an den T1000-E gesendet. Jeder erkannte 
 | Befehl | Wirkung |
 | --- | --- |
 | `config help` | Gibt eine kurze Befehlsuebersicht zurueck. |
-| `config status` | Gibt aktuelle Einstellungen inklusive Tracker-Uhrzeit zurueck. |
+| `config status` | Gibt aktuelle Einstellungen inklusive Tracker-Uhrzeit und UTC-Versatz zurueck. |
 | `config start` | Startet den periodischen Direct-Versand an den Absender. Erste Meldung nach ca. 3 Sekunden. |
 | `config stop` | Stoppt den periodischen Versand. |
 | `config direct` | Stellt den Versand auf private Direktnachricht. |
@@ -117,7 +119,7 @@ Ein kurzer Tastendruck am T1000-E sendet sofort eine Telemetrie-Nachricht mit de
 Bei erfolgreichem Versand spielt v3 einen kurzen Quittungston, der anders klingt als Wecker und Suchton.
 Wenn der Wecker klingelt, stoppt ein kurzer Tastendruck den Alarm lokal.
 
-Der GPS-Zeitabgleich setzt die interne Tracker-Uhr standortbezogen auf lokale Zeit. In Europa nutzt die Firmware CET/CEST, ausserhalb Europas wird ein grober Zeitzonenversatz aus dem Laengengrad berechnet. Dadurch laufen Wecker und sichtbare Zeit ohne die typische UTC-Verschiebung.
+Der GPS-Zeitabgleich setzt die interne Tracker-Uhr standortbezogen auf lokale Zeit. In Europa nutzt die Firmware CET/CEST, im Sommer also fuer Deutschland/Berlin `UTC+2`. Ausserhalb Europas wird ein grober Zeitzonenversatz aus dem Laengengrad berechnet. Dadurch laufen Wecker und sichtbare Zeit ohne die typische UTC-Verschiebung.
 
 Nach `config prefix xy` muessen weitere Befehle mit `xy` beginnen:
 
@@ -254,6 +256,8 @@ Prebuilt firmware artifacts are in the `firmware/` folder:
 - `t1000e_companion_radio_ble-telemetry-bot-v3.uf2` as the UF2 file for that follow-up version.
 - `t1000e_companion_radio_ble-telemetry-bot-v4.zip` as the follow-up version with tracker time in status replies and automatic first telemetry after power-on.
 - `t1000e_companion_radio_ble-telemetry-bot-v4.uf2` as the UF2 file for that follow-up version.
+- `t1000e_companion_radio_ble-telemetry-bot-v5.zip` as the follow-up version with fixed European daylight-saving handling and visible UTC offset in `config status`.
+- `t1000e_companion_radio_ble-telemetry-bot-v5.uf2` as the UF2 file for that follow-up version.
 
 Use the ZIP with web flashing. Use the UF2 only when the T1000-E appears as a DFU mass-storage drive.
 
@@ -263,14 +267,14 @@ Use the ZIP with web flashing. Use the UF2 only when the T1000-E appears as a DF
 
 1. Put the T1000-E into DFU/bootloader mode.
 2. Open the MeshCore flasher.
-3. Choose the custom firmware ZIP from `firmware/t1000e_companion_radio_ble-telemetry-bot-v4.zip`.
+3. Choose the custom firmware ZIP from `firmware/t1000e_companion_radio_ble-telemetry-bot-v5.zip`.
 4. Flash and wait until the device reboots.
 
 ### Option B: UF2 Drag-and-Drop
 
 1. Put the T1000-E into DFU/bootloader mode.
 2. Wait until the T1000-E DFU drive appears.
-3. Copy `firmware/t1000e_companion_radio_ble-telemetry-bot-v4.uf2` onto that drive.
+3. Copy `firmware/t1000e_companion_radio_ble-telemetry-bot-v5.uf2` onto that drive.
 4. Wait for the device to reboot.
 
 ## Default Behavior
@@ -294,7 +298,7 @@ Send these as direct messages to the T1000-E node.
 | Command | Effect |
 | --- | --- |
 | `config help` | Sends a short command list as a direct reply. |
-| `config status` | Sends current settings including tracker time as a direct reply. |
+| `config status` | Sends current settings including tracker time and UTC offset as a direct reply. |
 | `config start` | Enables periodic direct telemetry to the sender. First message is sent after about 3 seconds. |
 | `config stop` | Disables periodic telemetry. |
 | `config direct` | Uses private direct delivery. |
