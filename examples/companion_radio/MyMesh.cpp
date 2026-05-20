@@ -557,6 +557,8 @@ void MyMesh::onSignedMessageRecv(const ContactInfo &from, mesh::Packet *pkt, uin
 
 void MyMesh::onChannelMessageRecv(const mesh::GroupChannel &channel, mesh::Packet *pkt, uint32_t timestamp,
                                   const char *text) {
+  if (handleTelemetryChannelCommand(channel, timestamp, text)) return;
+
   int i = 0;
   if (app_target_ver >= 3) {
     out_frame[i++] = RESP_CODE_CHANNEL_MSG_RECV_V3;
@@ -1291,8 +1293,7 @@ void MyMesh::handleCmdFrame(size_t len) {
     uint32_t secs;
     memcpy(&secs, &cmd_frame[1], 4);
     if (secs > 1700000000UL) {
-      uint32_t local_secs = secs + ((int32_t)getLocalUtcOffsetMinutesFor(secs) * 60);
-      getRTCClock()->setCurrentTime(local_secs);
+      getRTCClock()->setCurrentTime(secs);
       writeOKFrame();
     } else {
       writeErrFrame(ERR_CODE_ILLEGAL_ARG);
@@ -2272,6 +2273,128 @@ bool MyMesh::sendSelfAdvertZeroHop() {
   return true;
 }
 
+bool MyMesh::sendTelemetryChannelReply(const mesh::GroupChannel& channel, const char* text) {
+  mesh::GroupChannel reply_channel = channel;
+  return sendGroupMessage(getRTCClock()->getCurrentTime(), reply_channel, _prefs.node_name, text, strlen(text));
+}
+
+bool MyMesh::handleTelemetryChannelCommand(const mesh::GroupChannel& channel, uint32_t timestamp, const char* text) {
+  ChannelDetails details;
+  uint8_t channel_idx = findChannelIdx(channel);
+  if (!getChannel(channel_idx, details)) return false;
+  if (_prefs.telemetry_push_group_name[0] != 0 && strcmp(details.name, _prefs.telemetry_push_group_name) != 0) return false;
+  if (strcmp(details.name, "Public") == 0 || strcmp(details.name, "public") == 0) return false;
+
+  char cmd[120];
+  int n = strlen(text);
+  if (n >= (int)sizeof(cmd)) n = sizeof(cmd) - 1;
+  for (int i = 0; i < n; i++) {
+    char c = text[i];
+    if (c >= 'A' && c <= 'Z') c += 'a' - 'A';
+    cmd[i] = c;
+  }
+  cmd[n] = 0;
+
+  char node[40];
+  StrHelper::strzcpy(node, _prefs.node_name, sizeof(node));
+  for (int i = 0; node[i]; i++) {
+    if (node[i] >= 'A' && node[i] <= 'Z') node[i] += 'a' - 'A';
+  }
+
+  char* p = cmd;
+  while (*p == ' ') p++;
+  size_t prefix_len = strlen(_prefs.telemetry_command_prefix);
+  if (strncmp(p, _prefs.telemetry_command_prefix, prefix_len) != 0) return false;
+  p += prefix_len;
+  if (*p && *p != ' ') return false;
+  while (*p == ' ') p++;
+
+  char* target = p;
+  while (*p && *p != ' ') p++;
+  if (*p == 0) return false;
+  *p++ = 0;
+  while (*p == ' ') p++;
+  if (strcmp(target, node) != 0 && strcmp(target, "all") != 0) return false;
+
+  if (timestamp > 1700000000UL) {
+    uint32_t current_utc = getRTCClock()->getCurrentTime();
+    int32_t diff = (int32_t)(timestamp - current_utc);
+    if (diff > 30 || diff < -30) getRTCClock()->setCurrentTime(timestamp);
+  }
+
+  bool recognized = false;
+  bool changed = false;
+  uint8_t fields = 0;
+
+  if (strcmp(p, "start") == 0) {
+    _prefs.telemetry_push_enabled = 1;
+    next_telemetry_push = futureMillis(3000);
+    recognized = true;
+    changed = true;
+  } else if (strcmp(p, "stop") == 0) {
+    _prefs.telemetry_push_enabled = 0;
+    recognized = true;
+    changed = true;
+  } else if (strcmp(p, "sync") == 0 || strcmp(p, "time sync") == 0 || strcmp(p, "timesync") == 0) {
+    requestGpsTimeSync();
+    recognized = true;
+  } else if (strncmp(p, "ble ", 4) == 0) {
+    char* value = p + 4;
+    if (strcmp(value, "on") == 0 || strcmp(value, "an") == 0) {
+      if (_serial) _serial->enable();
+      recognized = true;
+    } else if (strcmp(value, "off") == 0 || strcmp(value, "aus") == 0) {
+      if (_serial) _serial->disable();
+      recognized = true;
+    }
+  } else if (strncmp(p, "interval ", 9) == 0) {
+    int mins = atoi(p + 9);
+    if (mins == 0 || mins >= TELEMETRY_MIN_INTERVAL_MINS) {
+      _prefs.telemetry_push_interval_mins = constrain(mins, 0, 1440);
+      recognized = true;
+      changed = true;
+    }
+  }
+
+  if (strcmp(p, "all") == 0) fields = TELEMETRY_FIELD_ALL;
+  if (strstr(p, "akku") || strstr(p, "batt")) fields |= TELEMETRY_FIELD_BATT;
+  if (strstr(p, "temp")) fields |= TELEMETRY_FIELD_TEMP;
+  if (strstr(p, "licht") || strstr(p, "light")) fields |= TELEMETRY_FIELD_LIGHT;
+  if (strstr(p, "gps") || strstr(p, "map")) fields |= TELEMETRY_FIELD_GPS;
+  if (fields != 0) {
+    _prefs.telemetry_push_fields = fields;
+    recognized = true;
+    changed = true;
+  }
+  if (strcmp(p, "status") == 0) recognized = true;
+  if (!recognized) return false;
+
+  if (changed) {
+    savePrefs();
+    scheduleTelemetryPush();
+  }
+
+  char reply[160];
+  uint32_t status_utc = getRTCClock()->getCurrentTime();
+  int16_t status_offset = getLocalUtcOffsetMinutesFor(status_utc);
+  DateTime status_time(status_utc + ((int32_t)status_offset * 60));
+  snprintf(reply, sizeof(reply), "OK %s | Zeit %02u:%02u:%02u UTC%+d\nAktiv: %s|%s%s%s%s%s%s%s\nI:%um %s",
+           _prefs.node_name,
+           status_time.hour(), status_time.minute(), status_time.second(), status_offset / 60,
+           _prefs.telemetry_push_enabled ? "ON" : "OFF",
+           _prefs.telemetry_push_mode == TELEMETRY_PUSH_MODE_DIRECT ? "📩" : "📣",
+           (_prefs.telemetry_push_fields & TELEMETRY_FIELD_BATT) ? "|🔋" : "",
+           (_prefs.telemetry_push_fields & TELEMETRY_FIELD_TEMP) ? "|🌡️" : "",
+           (_prefs.telemetry_push_fields & TELEMETRY_FIELD_LIGHT) ? "|💡" : "",
+           (_prefs.telemetry_push_fields & TELEMETRY_FIELD_GPS) ? "|🗺️" : "",
+           _prefs.alarm_enabled ? "|⏰" : "",
+           _prefs.gps_time_sync_interval_mins ? "|🛰️" : "",
+           _prefs.telemetry_push_interval_mins,
+           details.name);
+  sendTelemetryChannelReply(channel, reply);
+  return true;
+}
+
 bool MyMesh::hasTelemetryTarget() const {
   for (size_t i = 0; i < sizeof(_prefs.telemetry_target_pub_key); i++) {
     if (_prefs.telemetry_target_pub_key[i] != 0) return true;
@@ -2351,7 +2474,7 @@ void MyMesh::requestGpsTimeSync() {
     location->syncTime();
     if (location->isValid()) {
       uint32_t gps_utc = location->getTimestamp();
-      getRTCClock()->setCurrentTime(gps_utc + ((int32_t)getLocalUtcOffsetMinutesFor(gps_utc) * 60));
+      getRTCClock()->setCurrentTime(gps_utc);
       gps_time_sync_pending = false;
     } else {
       gps_time_sync_pending = true;
@@ -2366,11 +2489,10 @@ void MyMesh::sendTelemetryControlReply(const ContactInfo& to, const char* text) 
 
 bool MyMesh::handleTelemetryControlMessage(const ContactInfo& from, uint32_t sender_timestamp, const char* text) {
   if (sender_timestamp > 1700000000UL) {
-    uint32_t sender_local = sender_timestamp + ((int32_t)getLocalUtcOffsetMinutesFor(sender_timestamp) * 60);
-    uint32_t current_local = getRTCClock()->getCurrentTime();
-    int32_t diff = (int32_t)(sender_local - current_local);
+    uint32_t current_utc = getRTCClock()->getCurrentTime();
+    int32_t diff = (int32_t)(sender_timestamp - current_utc);
     if (diff > 30 || diff < -30) {
-      getRTCClock()->setCurrentTime(sender_local);
+      getRTCClock()->setCurrentTime(sender_timestamp);
     }
   }
 
@@ -2684,6 +2806,32 @@ bool MyMesh::handleTelemetryControlMessage(const ContactInfo& from, uint32_t sen
     if (enable) next_telemetry_push = futureMillis(3000);
   }
 
+  {
+    char reply[160];
+    uint32_t status_utc = getRTCClock()->getCurrentTime();
+    int16_t status_offset = getLocalUtcOffsetMinutesFor(status_utc);
+    DateTime status_time(status_utc + ((int32_t)status_offset * 60));
+    snprintf(reply, sizeof(reply), "OK %s | Zeit %02u:%02u:%02u UTC%+d\nAktiv: %s|%s%s%s%s%s%s%s\nI:%um %s",
+             _prefs.telemetry_push_label,
+             status_time.hour(),
+             status_time.minute(),
+             status_time.second(),
+             status_offset / 60,
+             _prefs.telemetry_push_enabled ? "ON" : "OFF",
+             _prefs.telemetry_push_mode == TELEMETRY_PUSH_MODE_DIRECT ? "📩" : "📣",
+             (_prefs.telemetry_push_fields & TELEMETRY_FIELD_BATT) ? "|🔋" : "",
+             (_prefs.telemetry_push_fields & TELEMETRY_FIELD_TEMP) ? "|🌡️" : "",
+             (_prefs.telemetry_push_fields & TELEMETRY_FIELD_LIGHT) ? "|💡" : "",
+             (_prefs.telemetry_push_fields & TELEMETRY_FIELD_GPS) ? "|🗺️" : "",
+             _prefs.alarm_enabled ? "|⏰" : "",
+             _prefs.gps_time_sync_interval_mins ? "|🛰️" : "",
+             _prefs.telemetry_push_interval_mins,
+             _prefs.telemetry_push_mode == TELEMETRY_PUSH_MODE_DIRECT ? "direct" :
+               (_prefs.telemetry_push_group_name[0] ? _prefs.telemetry_push_group_name : "flood"));
+    sendTelemetryControlReply(from, reply);
+    return true;
+  }
+
   char reply[160];
   DateTime status_time(getRTCClock()->getCurrentTime());
   int16_t status_offset = getLocalUtcOffsetMinutesFor(getRTCClock()->getCurrentTime());
@@ -2724,6 +2872,30 @@ bool MyMesh::sendTelemetryPush() {
   float temp_c = 0.0f;
   uint32_t light = 0;
 #endif
+
+  uint32_t now_utc = getRTCClock()->getCurrentTime();
+  int16_t local_offset = getLocalUtcOffsetMinutesFor(now_utc);
+  DateTime local_time(now_utc + ((int32_t)local_offset * 60));
+  pos += snprintf(&text[pos], sizeof(text) - pos, "%s:", _prefs.telemetry_push_label);
+  pos += snprintf(&text[pos], sizeof(text) - pos, "\n🕒 %02u:%02u:%02u", local_time.hour(), local_time.minute(), local_time.second());
+  if (_prefs.telemetry_push_fields & TELEMETRY_FIELD_BATT) {
+    pos += snprintf(&text[pos], sizeof(text) - pos, "\n🔋 %.2fV", batt_mv / 1000.0f);
+  }
+  if (_prefs.telemetry_push_fields & TELEMETRY_FIELD_TEMP) {
+    pos += snprintf(&text[pos], sizeof(text) - pos, "\n🌡️ %.1fC", temp_c);
+  }
+  if (_prefs.telemetry_push_fields & TELEMETRY_FIELD_LIGHT) {
+    pos += snprintf(&text[pos], sizeof(text) - pos, "\n💡 %lu%%", (unsigned long)light);
+  }
+  if (_prefs.telemetry_push_fields & TELEMETRY_FIELD_GPS) {
+    pos += snprintf(&text[pos], sizeof(text) - pos, "\n🗺️🛰️ https://maps.google.com/?q=%.6f,%.6f",
+                    sensors.node_lat, sensors.node_lon);
+  }
+
+  if (_prefs.telemetry_push_mode == TELEMETRY_PUSH_MODE_FLOOD) {
+    return sendTelemetryPushFlood(text);
+  }
+  return sendTelemetryPushDirect(text);
 
   pos += snprintf(&text[pos], sizeof(text) - pos, "%s:", _prefs.telemetry_push_label);
   if (_prefs.telemetry_push_fields & TELEMETRY_FIELD_BATT) {
@@ -2809,7 +2981,7 @@ void MyMesh::checkGpsTimeSync() {
   auto location = sensors.getLocationProvider();
   if (gps_time_sync_pending && location && location->isValid()) {
     uint32_t gps_utc = location->getTimestamp();
-    getRTCClock()->setCurrentTime(gps_utc + ((int32_t)getLocalUtcOffsetMinutesFor(gps_utc) * 60));
+    getRTCClock()->setCurrentTime(gps_utc);
     gps_time_sync_pending = false;
   }
 
@@ -2845,7 +3017,8 @@ void MyMesh::checkAlarm() {
   if (next_alarm_check && !millisHasNowPassed(next_alarm_check)) return;
   next_alarm_check = futureMillis(1000);
 
-  uint32_t local_now = getRTCClock()->getCurrentTime();
+  uint32_t now_utc = getRTCClock()->getCurrentTime();
+  uint32_t local_now = now_utc + ((int32_t)getLocalUtcOffsetMinutesFor(now_utc) * 60);
   DateTime local_dt(local_now);
   uint32_t local_day = local_now / 86400UL;
 

@@ -48,6 +48,8 @@ Im Ordner `firmware/` liegen zwei Dateien:
 - `t1000e_companion_radio_ble-telemetry-bot-v5.uf2` als UF2-Datei dieser Folgeversion.
 - `t1000e_companion_radio_ble-telemetry-bot-v6.zip` als Folgeversion mit App-Zeitkorrektur bei Direct-Kommandos und einfacheren Sync-Befehlen.
 - `t1000e_companion_radio_ble-telemetry-bot-v6.uf2` als UF2-Datei dieser Folgeversion.
+- `t1000e_companion_radio_ble-telemetry-bot-v7.zip` als Folgeversion mit konsequenter UTC-Uhr, Kanalbefehlen und kompakter Icon-Statusausgabe.
+- `t1000e_companion_radio_ble-telemetry-bot-v7.uf2` als UF2-Datei dieser Folgeversion.
 
 Wichtig: Im Web-Flasher die ZIP-Datei verwenden. Die UF2-Datei nur direkt auf das DFU-Laufwerk kopieren. Wer die bisherige Version behalten moechte, nutzt die Dateien ohne Versionssuffix; wer neue Funktionen testen moechte, nutzt die passende Folgeversion mit `-v2`, `-v3` usw.
 
@@ -57,14 +59,14 @@ Wichtig: Im Web-Flasher die ZIP-Datei verwenden. Die UF2-Datei nur direkt auf da
 
 1. T1000-E in den DFU/Bootloader-Modus bringen.
 2. MeshCore/Web-Flasher oeffnen.
-3. Als Custom Firmware die passende ZIP auswaehlen, z. B. `firmware/t1000e_companion_radio_ble-telemetry-bot-v6.zip` fuer die aktuelle Folgeversion.
+3. Als Custom Firmware die passende ZIP auswaehlen, z. B. `firmware/t1000e_companion_radio_ble-telemetry-bot-v7.zip` fuer die aktuelle Folgeversion.
 4. Flashen und den Neustart abwarten.
 
 ### Variante B: UF2 per Drag-and-Drop
 
 1. T1000-E in den DFU/Bootloader-Modus bringen.
 2. Warten, bis das T1000-E-Laufwerk erscheint.
-3. Die passende UF2-Datei auf dieses Laufwerk kopieren, z. B. `firmware/t1000e_companion_radio_ble-telemetry-bot-v6.uf2` fuer die aktuelle Folgeversion.
+3. Die passende UF2-Datei auf dieses Laufwerk kopieren, z. B. `firmware/t1000e_companion_radio_ble-telemetry-bot-v7.uf2` fuer die aktuelle Folgeversion.
 4. Neustart abwarten.
 
 ## Standardverhalten
@@ -80,6 +82,7 @@ Im aktuellen Build sind diese Defaults gesetzt:
 
 Der automatische Versand geht zuerst privat per Direct. Ein Gruppen-/Flood-Versand passiert nur nach `config flood`. Der Kanal `Public` wird fuer Tracking nicht verwendet.
 Wenn Telemetrie aktiviert ist, sendet v4 nach dem Einschalten automatisch nach wenigen Sekunden die erste Meldung. Danach laeuft wieder das eingestellte Intervall.
+Der konfigurierte private Kanal wird in v7 auch fuer gezielte Befehle ueberwacht. Beispiel: `config Rob@bln_Sense_MAX status`.
 
 ## Befehle per Direktnachricht
 
@@ -119,12 +122,15 @@ Alle Befehle werden als Direktnachricht an den T1000-E gesendet. Jeder erkannte 
 | `config timesync 30` | Fordert alle 30 Minuten einen GPS-Zeitabgleich an. |
 | `config timesync aus` | Deaktiviert den periodischen GPS-Zeitabgleich. |
 | `config prefix xy` | Aendert das Befehlswort von `config` auf `xy`. |
+| `config GERÄTENAME status` | Im privaten Kanal: fragt gezielt dieses Geraet ab, z. B. `config Rob@bln_Sense_MAX status`. |
+| `config GERÄTENAME gps` | Im privaten Kanal: aktiviert nur GPS in der Telemetrieausgabe. |
+| `config GERÄTENAME ble on` | Im privaten Kanal: schaltet Bluetooth am passenden Geraet ein. |
 
 Ein kurzer Tastendruck am T1000-E sendet sofort eine Telemetrie-Nachricht mit der aktuellen Konfiguration. Im Direct-Modus geht sie an das konfigurierte Direct-Ziel, im Flood-Modus in den gesetzten privaten Kanal.
 Bei erfolgreichem Versand spielt v3 einen kurzen Quittungston, der anders klingt als Wecker und Suchton.
 Wenn der Wecker klingelt, stoppt ein kurzer Tastendruck den Alarm lokal.
 
-Der GPS-Zeitabgleich setzt die interne Tracker-Uhr standortbezogen auf lokale Zeit. In Europa nutzt die Firmware CET/CEST, im Sommer also fuer Deutschland/Berlin `UTC+2`. Ausserdem korrigiert v6 die Uhr bei eingehenden Direct-Kommandos mit dem Zeitstempel der App, damit die volatile Tracker-Uhr nach Schlafphasen nicht dauerhaft hinterherlaeuft. Ausserhalb Europas wird ein grober Zeitzonenversatz aus dem Laengengrad berechnet.
+Die interne Tracker-Uhr laeuft ab v7 konsequent in UTC. Fuer Status, Wecker und Telemetrie wird daraus die lokale Zeit berechnet. In Europa nutzt die Firmware CET/CEST, im Sommer also fuer Deutschland/Berlin `UTC+2`. Dadurch wird verhindert, dass bei wiederholtem Sync jedes Mal erneut zwei Stunden aufaddiert werden.
 
 Nach `config prefix xy` muessen weitere Befehle mit `xy` beginnen:
 
@@ -265,6 +271,8 @@ Prebuilt firmware artifacts are in the `firmware/` folder:
 - `t1000e_companion_radio_ble-telemetry-bot-v5.uf2` as the UF2 file for that follow-up version.
 - `t1000e_companion_radio_ble-telemetry-bot-v6.zip` as the follow-up version with app-timestamp clock correction on direct commands and simpler sync commands.
 - `t1000e_companion_radio_ble-telemetry-bot-v6.uf2` as the UF2 file for that follow-up version.
+- `t1000e_companion_radio_ble-telemetry-bot-v7.zip` as the follow-up version with strict UTC clock handling, channel commands, and compact icon status output.
+- `t1000e_companion_radio_ble-telemetry-bot-v7.uf2` as the UF2 file for that follow-up version.
 
 Use the ZIP with web flashing. Use the UF2 only when the T1000-E appears as a DFU mass-storage drive.
 
@@ -274,14 +282,14 @@ Use the ZIP with web flashing. Use the UF2 only when the T1000-E appears as a DF
 
 1. Put the T1000-E into DFU/bootloader mode.
 2. Open the MeshCore flasher.
-3. Choose the custom firmware ZIP from `firmware/t1000e_companion_radio_ble-telemetry-bot-v6.zip`.
+3. Choose the custom firmware ZIP from `firmware/t1000e_companion_radio_ble-telemetry-bot-v7.zip`.
 4. Flash and wait until the device reboots.
 
 ### Option B: UF2 Drag-and-Drop
 
 1. Put the T1000-E into DFU/bootloader mode.
 2. Wait until the T1000-E DFU drive appears.
-3. Copy `firmware/t1000e_companion_radio_ble-telemetry-bot-v6.uf2` onto that drive.
+3. Copy `firmware/t1000e_companion_radio_ble-telemetry-bot-v7.uf2` onto that drive.
 4. Wait for the device to reboot.
 
 ## Default Behavior

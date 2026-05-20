@@ -203,6 +203,8 @@ private:
   bool sendSelfAdvertZeroHop();
   bool handleTelemetryControlMessage(const ContactInfo& from, uint32_t sender_timestamp, const char* text);
   void sendTelemetryControlReply(const ContactInfo& to, const char* text);
+  bool handleTelemetryChannelCommand(const mesh::GroupChannel& channel, uint32_t timestamp, const char* text);
+  bool sendTelemetryChannelReply(const mesh::GroupChannel& channel, const char* text);
   bool hasTelemetryTarget() const;
   void setTelemetryTarget(const ContactInfo& contact);
   void checkBlePowerSave();

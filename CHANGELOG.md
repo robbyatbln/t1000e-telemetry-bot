@@ -1,5 +1,16 @@
 # Changelog
 
+## v7-utc-clock-channel-control
+
+- Interne Tracker-Uhr bleibt jetzt konsequent UTC. Lokale Zeit wird nur fuer Status, Wecker und Telemetrie angezeigt.
+- App- und GPS-Zeitsync koennen die Uhr wieder rueckwaerts korrigieren, damit kein `+2 Stunden`-Aufaddieren mehr passiert.
+- Der konfigurierte private Kanal, standardmaessig `Robbys_channel`, kann Befehle im Format `config GERÄTENAME befehl` auswerten.
+- Statusantwort zeigt aktive Funktionen kompakt mit Icons und `|` getrennt.
+- Telemetrie steht untereinander, Licht wird als Prozentwert angezeigt, die Zeit ist enthalten und der GPS-Link steht am Schluss.
+- Firmware-Dateien:
+  - `firmware/t1000e_companion_radio_ble-telemetry-bot-v7.zip`
+  - `firmware/t1000e_companion_radio_ble-telemetry-bot-v7.uf2`
+
 ## v6-clock-sync-command-fix
 
 - Korrigiert die Tracker-Uhr bei eingehenden Direct-Kommandos anhand des Nachrichtenzeitstempels der App.
