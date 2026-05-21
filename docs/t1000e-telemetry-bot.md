@@ -50,6 +50,8 @@ Im Ordner `firmware/` liegen zwei Dateien:
 - `t1000e_companion_radio_ble-telemetry-bot-v6.uf2` als UF2-Datei dieser Folgeversion.
 - `t1000e_companion_radio_ble-telemetry-bot-v7.zip` als Folgeversion mit konsequenter UTC-Uhr, Kanalbefehlen und kompakter Icon-Statusausgabe.
 - `t1000e_companion_radio_ble-telemetry-bot-v7.uf2` als UF2-Datei dieser Folgeversion.
+- `t1000e_companion_radio_ble-telemetry-bot-v8.zip` als Folgeversion mit korrigierter Erkennung von Kanalbefehlen mit Absender-Praefix.
+- `t1000e_companion_radio_ble-telemetry-bot-v8.uf2` als UF2-Datei dieser Folgeversion.
 
 Wichtig: Im Web-Flasher die ZIP-Datei verwenden. Die UF2-Datei nur direkt auf das DFU-Laufwerk kopieren. Wer die bisherige Version behalten moechte, nutzt die Dateien ohne Versionssuffix; wer neue Funktionen testen moechte, nutzt die passende Folgeversion mit `-v2`, `-v3` usw.
 
@@ -59,14 +61,14 @@ Wichtig: Im Web-Flasher die ZIP-Datei verwenden. Die UF2-Datei nur direkt auf da
 
 1. T1000-E in den DFU/Bootloader-Modus bringen.
 2. MeshCore/Web-Flasher oeffnen.
-3. Als Custom Firmware die passende ZIP auswaehlen, z. B. `firmware/t1000e_companion_radio_ble-telemetry-bot-v7.zip` fuer die aktuelle Folgeversion.
+3. Als Custom Firmware die passende ZIP auswaehlen, z. B. `firmware/t1000e_companion_radio_ble-telemetry-bot-v8.zip` fuer die aktuelle Folgeversion.
 4. Flashen und den Neustart abwarten.
 
 ### Variante B: UF2 per Drag-and-Drop
 
 1. T1000-E in den DFU/Bootloader-Modus bringen.
 2. Warten, bis das T1000-E-Laufwerk erscheint.
-3. Die passende UF2-Datei auf dieses Laufwerk kopieren, z. B. `firmware/t1000e_companion_radio_ble-telemetry-bot-v7.uf2` fuer die aktuelle Folgeversion.
+3. Die passende UF2-Datei auf dieses Laufwerk kopieren, z. B. `firmware/t1000e_companion_radio_ble-telemetry-bot-v8.uf2` fuer die aktuelle Folgeversion.
 4. Neustart abwarten.
 
 ## Standardverhalten
@@ -82,7 +84,7 @@ Im aktuellen Build sind diese Defaults gesetzt:
 
 Der automatische Versand geht zuerst privat per Direct. Ein Gruppen-/Flood-Versand passiert nur nach `config flood`. Der Kanal `Public` wird fuer Tracking nicht verwendet.
 Wenn Telemetrie aktiviert ist, sendet v4 nach dem Einschalten automatisch nach wenigen Sekunden die erste Meldung. Danach laeuft wieder das eingestellte Intervall.
-Der konfigurierte private Kanal wird in v7 auch fuer gezielte Befehle ueberwacht. Beispiel: `config Rob@bln_Sense_MAX status`.
+Der konfigurierte private Kanal wird in v7 auch fuer gezielte Befehle ueberwacht. Beispiel: `config Rob@bln_Sense_MAX status`. Ab v8 werden dabei auch MeshCore-Gruppentexte mit Absender-Praefix erkannt, z. B. `Rob@bln_Bot: config Rob@bln_Sense_MAX status`.
 
 ## Befehle per Direktnachricht
 

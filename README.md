@@ -4,7 +4,7 @@ Dies ist eine angepasste MeshCore BLE Companion Firmware fuer den Seeed Studio S
 
 Der Unterschied zur normalen MeshCore T1000-E Companion Firmware: Dieses Build sendet Akku, GPS, Temperatur und Licht bevorzugt als private Direktnachricht, kann bei Bedarf bewusst auf Flood in einen privaten Kanal gestellt werden, erzeugt Google-Maps-Links, sendet per kurzem Tastendruck sofort eine Telemetrie-Nachricht und kann per `config wo ist 3` ein Suchsignal am Geraet mehrfach abspielen. Es geht also nicht um "noch einen Bot", sondern um eine praktische Tracking-Funktion direkt im MeshCore-Chat.
 
-Fertige Firmware-Dateien liegen in [`firmware/`](./firmware). Bisherige Varianten bleiben bestehen; neue Folgeversionen liegen zusaetzlich als `-v2`, `-v3`, `-v4`, `-v5`, `-v6`, `-v7` usw. daneben. Die vollstaendige deutsche Anleitung und der Vergleich zur Original-Firmware stehen hier: [`docs/t1000e-telemetry-bot.md`](./docs/t1000e-telemetry-bot.md). Aenderungen pro Version stehen im [`CHANGELOG.md`](./CHANGELOG.md).
+Fertige Firmware-Dateien liegen in [`firmware/`](./firmware). Bisherige Varianten bleiben bestehen; neue Folgeversionen liegen zusaetzlich als `-v2`, `-v3`, `-v4`, `-v5`, `-v6`, `-v7`, `-v8` usw. daneben. Die vollstaendige deutsche Anleitung und der Vergleich zur Original-Firmware stehen hier: [`docs/t1000e-telemetry-bot.md`](./docs/t1000e-telemetry-bot.md). Aenderungen pro Version stehen im [`CHANGELOG.md`](./CHANGELOG.md).
 
 ---
 

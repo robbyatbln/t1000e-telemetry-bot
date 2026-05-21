@@ -1,5 +1,13 @@
 # Changelog
 
+## v8-channel-prefix-fix
+
+- Kanalbefehle erkennen jetzt auch MeshCore-Gruppentexte im Format `Absender: config GERÄTENAME befehl`.
+- Dadurch sollte `config GERÄTENAME status` aus `Robbys_channel` heraus eine Quittung im Kanal erzeugen.
+- Firmware-Dateien:
+  - `firmware/t1000e_companion_radio_ble-telemetry-bot-v8.zip`
+  - `firmware/t1000e_companion_radio_ble-telemetry-bot-v8.uf2`
+
 ## v7-utc-clock-channel-control
 
 - Interne Tracker-Uhr bleibt jetzt konsequent UTC. Lokale Zeit wird nur fuer Status, Wecker und Telemetrie angezeigt.

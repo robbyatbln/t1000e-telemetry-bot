@@ -2295,14 +2295,22 @@ bool MyMesh::handleTelemetryChannelCommand(const mesh::GroupChannel& channel, ui
   }
   cmd[n] = 0;
 
+  char* p = cmd;
+  while (*p == ' ') p++;
+  if (strncmp(p, _prefs.telemetry_command_prefix, strlen(_prefs.telemetry_command_prefix)) != 0) {
+    char* prefixed_text = strstr(p, ": ");
+    if (prefixed_text) {
+      p = prefixed_text + 2;
+      while (*p == ' ') p++;
+    }
+  }
+
   char node[40];
   StrHelper::strzcpy(node, _prefs.node_name, sizeof(node));
   for (int i = 0; node[i]; i++) {
     if (node[i] >= 'A' && node[i] <= 'Z') node[i] += 'a' - 'A';
   }
 
-  char* p = cmd;
-  while (*p == ' ') p++;
   size_t prefix_len = strlen(_prefs.telemetry_command_prefix);
   if (strncmp(p, _prefs.telemetry_command_prefix, prefix_len) != 0) return false;
   p += prefix_len;
