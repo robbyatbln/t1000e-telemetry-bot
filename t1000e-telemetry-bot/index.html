@@ -1371,6 +1371,8 @@
 <li><code>t1000e_companion_radio_ble-telemetry-bot-v6.uf2</code> als UF2-Datei dieser Folgeversion.</li>
 <li><code>t1000e_companion_radio_ble-telemetry-bot-v7.zip</code> als Folgeversion mit konsequenter UTC-Uhr, Kanalbefehlen und kompakter Icon-Statusausgabe.</li>
 <li><code>t1000e_companion_radio_ble-telemetry-bot-v7.uf2</code> als UF2-Datei dieser Folgeversion.</li>
+<li><code>t1000e_companion_radio_ble-telemetry-bot-v8.zip</code> als Folgeversion mit korrigierter Erkennung von Kanalbefehlen mit Absender-Praefix.</li>
+<li><code>t1000e_companion_radio_ble-telemetry-bot-v8.uf2</code> als UF2-Datei dieser Folgeversion.</li>
 </ul>
 <p>Wichtig: Im Web-Flasher die ZIP-Datei verwenden. Die UF2-Datei nur direkt auf das DFU-Laufwerk kopieren. Wer die bisherige Version behalten moechte, nutzt die Dateien ohne Versionssuffix; wer neue Funktionen testen moechte, nutzt die passende Folgeversion mit <code>-v2</code>, <code>-v3</code> usw.</p>
 <h2 id="flashen">Flashen</h2>
@@ -1378,14 +1380,14 @@
 <ol>
 <li>T1000-E in den DFU/Bootloader-Modus bringen.</li>
 <li>MeshCore/Web-Flasher oeffnen.</li>
-<li>Als Custom Firmware die passende ZIP auswaehlen, z. B. <code>firmware/t1000e_companion_radio_ble-telemetry-bot-v7.zip</code> fuer die aktuelle Folgeversion.</li>
+<li>Als Custom Firmware die passende ZIP auswaehlen, z. B. <code>firmware/t1000e_companion_radio_ble-telemetry-bot-v8.zip</code> fuer die aktuelle Folgeversion.</li>
 <li>Flashen und den Neustart abwarten.</li>
 </ol>
 <h3 id="variante-b-uf2-per-drag-and-drop">Variante B: UF2 per Drag-and-Drop</h3>
 <ol>
 <li>T1000-E in den DFU/Bootloader-Modus bringen.</li>
 <li>Warten, bis das T1000-E-Laufwerk erscheint.</li>
-<li>Die passende UF2-Datei auf dieses Laufwerk kopieren, z. B. <code>firmware/t1000e_companion_radio_ble-telemetry-bot-v7.uf2</code> fuer die aktuelle Folgeversion.</li>
+<li>Die passende UF2-Datei auf dieses Laufwerk kopieren, z. B. <code>firmware/t1000e_companion_radio_ble-telemetry-bot-v8.uf2</code> fuer die aktuelle Folgeversion.</li>
 <li>Neustart abwarten.</li>
 </ol>
 <h2 id="standardverhalten">Standardverhalten</h2>
@@ -1400,7 +1402,7 @@
 </ul>
 <p>Der automatische Versand geht zuerst privat per Direct. Ein Gruppen-/Flood-Versand passiert nur nach <code>config flood</code>. Der Kanal <code>Public</code> wird fuer Tracking nicht verwendet.
 Wenn Telemetrie aktiviert ist, sendet v4 nach dem Einschalten automatisch nach wenigen Sekunden die erste Meldung. Danach laeuft wieder das eingestellte Intervall.
-Der konfigurierte private Kanal wird in v7 auch fuer gezielte Befehle ueberwacht. Beispiel: <code>config Rob@bln_Sense_MAX status</code>.</p>
+Der konfigurierte private Kanal wird in v7 auch fuer gezielte Befehle ueberwacht. Beispiel: <code>config Rob@bln_Sense_MAX status</code>. Ab v8 werden dabei auch MeshCore-Gruppentexte mit Absender-Praefix erkannt, z. B. <code>Rob@bln_Bot: config Rob@bln_Sense_MAX status</code>.</p>
 <h2 id="befehle-per-direktnachricht">Befehle per Direktnachricht</h2>
 <p>Alle Befehle werden als Direktnachricht an den T1000-E gesendet. Jeder erkannte Befehl wird ebenfalls per Direktnachricht bestaetigt.</p>
 <table>
