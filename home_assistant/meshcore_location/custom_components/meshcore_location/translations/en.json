@@ -1,0 +1,40 @@
+{
+  "title": "MeshCore Location",
+  "config": {
+    "step": {
+      "user": {
+        "title": "Choose MeshCore channel",
+        "description": "Select a channel configured in the MeshCore integration. Its message entity and channel index are detected automatically.",
+        "data": {
+          "channel_selection": "MeshCore channel"
+        }
+      },
+      "participant": {
+        "title": "Choose participant",
+        "description": "Detected in the activity history of the chosen channel: {participants}. You can also enter a name if no GPS message exists yet.",
+        "data": {
+          "participant": "MeshCore participant"
+        }
+      },
+      "person": {
+        "title": "Choose person",
+        "description": "Select the person this tracker is intended for. After setup, add the generated tracker to this person once in Home Assistant settings.",
+        "data": {
+          "person_entity": "Home Assistant person",
+          "tracker_name": "Tracker name"
+        }
+      },
+      "confirm": {
+        "title": "Check configuration",
+        "description": "Source: {source_entity}\nChannel index: {channel_idx}\nParticipant: {participant}\nPerson: {person_entity}\nLast detected coordinate: {coordinate}\n\nAfter finishing, assign the new tracker once under Settings > People.",
+        "data": {
+          "confirm": "Create tracker"
+        }
+      }
+    },
+    "abort": {
+      "no_channels": "No loaded MeshCore channels were found. Check that the MeshCore integration is connected and has configured channels.",
+      "already_configured": "This participant is already configured for this channel entity."
+    }
+  }
+}

@@ -17,3 +17,6 @@ compile_commands.json
 .venv/
 venv/
 platformio.local.ini
+__pycache__/
+.pytest_cache/
+*.py[cod]

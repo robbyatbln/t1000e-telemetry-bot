@@ -1,0 +1,11 @@
+{
+  "domain": "meshcore_location",
+  "name": "MeshCore Location",
+  "codeowners": [],
+  "config_flow": true,
+  "dependencies": ["meshcore"],
+  "integration_type": "helper",
+  "iot_class": "local_push",
+  "requirements": [],
+  "version": "0.3.1"
+}

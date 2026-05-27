@@ -1,5 +1,18 @@
 # Changelog
 
+## home-assistant-meshcore-location-v0.3.1
+
+- Fuegt eine installierbare Home-Assistant-Custom-Integration unter
+  `home_assistant/meshcore_location/` hinzu.
+- Liest konfigurierte MeshCore-Channels aus der vorhandenen Integration und
+  erkennt beliebige Teilnehmer aus GPS-Meldungen im Aktivitaetsverlauf.
+- Erstellt Karten-Tracker sowie Channel-/Direct-Buttons fuer die
+  unterstuetzten Telemetry-Bot-Befehle.
+- Verwendet neutrale Beispiele und keine fest eingebauten privaten
+  Channel- oder Teilnehmernamen.
+- Installationsdatei:
+  - `home_assistant/meshcore_location.zip`
+
 ## v8-channel-prefix-fix
 
 - Kanalbefehle erkennen jetzt auch MeshCore-Gruppentexte im Format `Absender: config GERÄTENAME befehl`.
