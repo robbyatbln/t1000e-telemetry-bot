@@ -1,0 +1,40 @@
+{
+  "title": "MeshCore Standort",
+  "config": {
+    "step": {
+      "user": {
+        "title": "MeshCore-Channel auswaehlen",
+        "description": "Waehle einen in der MeshCore-Integration konfigurierten Channel. Die passende Nachrichten-Entity und Kanalnummer werden automatisch ermittelt.",
+        "data": {
+          "channel_selection": "MeshCore-Channel"
+        }
+      },
+      "participant": {
+        "title": "Teilnehmer auswaehlen",
+        "description": "Im Aktivitaetsverlauf des ausgewaehlten Channels erkannt: {participants}. Du kannst auch einen Teilnehmernamen eingeben, falls bisher noch keine GPS-Nachricht vorhanden ist.",
+        "data": {
+          "participant": "MeshCore Teilnehmer"
+        }
+      },
+      "person": {
+        "title": "Benutzer auswaehlen",
+        "description": "Waehle die Person, fuer die der Tracker gedacht ist. Nach der Installation wird der erzeugte Tracker einmalig in den Einstellungen dieser Person hinzugefuegt.",
+        "data": {
+          "person_entity": "Home Assistant Person",
+          "tracker_name": "Name des Trackers"
+        }
+      },
+      "confirm": {
+        "title": "Konfiguration pruefen",
+        "description": "Quelle: {source_entity}\nChannel-Index: {channel_idx}\nTeilnehmer: {participant}\nPerson: {person_entity}\nLetzte erkannte Koordinate: {coordinate}\n\nNach Fertigstellen den neuen Tracker einmalig unter Einstellungen > Personen der gewaehlten Person zuweisen.",
+        "data": {
+          "confirm": "Tracker erstellen"
+        }
+      }
+    },
+    "abort": {
+      "no_channels": "Es wurden keine geladenen MeshCore-Channels gefunden. Pruefe, ob die MeshCore-Integration verbunden ist und Channels konfiguriert sind.",
+      "already_configured": "Dieser Teilnehmer ist fuer diese Channel-Entity bereits eingerichtet."
+    }
+  }
+}

@@ -1,0 +1,13 @@
+{
+  "domain": "meshcore_location",
+  "name": "MeshCore Location",
+  "codeowners": ["@robbyatbln"],
+  "config_flow": true,
+  "dependencies": ["meshcore"],
+  "documentation": "https://github.com/robbyatbln/t1000e-telemetry-bot/blob/main/docs/home-assistant-meshcore-location.md",
+  "integration_type": "helper",
+  "iot_class": "local_push",
+  "issue_tracker": "https://github.com/robbyatbln/t1000e-telemetry-bot/issues",
+  "requirements": [],
+  "version": "0.3.2"
+}

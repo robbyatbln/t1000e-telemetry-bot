@@ -6,6 +6,22 @@ Der Unterschied zur normalen MeshCore T1000-E Companion Firmware: Dieses Build s
 
 Fertige Firmware-Dateien liegen in [`firmware/`](./firmware). Bisherige Varianten bleiben bestehen; neue Folgeversionen liegen zusaetzlich als `-v2`, `-v3`, `-v4`, `-v5`, `-v6`, `-v7`, `-v8` usw. daneben. Die vollstaendige deutsche Anleitung und der Vergleich zur Original-Firmware stehen hier: [`docs/t1000e-telemetry-bot.md`](./docs/t1000e-telemetry-bot.md). Aenderungen pro Version stehen im [`CHANGELOG.md`](./CHANGELOG.md).
 
+## Home Assistant Integration
+
+Fuer Nutzer der MeshCore-Integration in Home Assistant steht zusaetzlich eine
+allgemeine Custom Integration bereit. Sie liest konfigurierte private Channels
+aus, erkennt beliebige Tracker-Teilnehmer aus Standortmeldungen, legt
+GPS-Tracker fuer die Karte an und stellt Buttons fuer die unterstuetzten
+Firmware-Befehle bereit.
+
+- Installations-ZIP: [`home_assistant/meshcore_location.zip`](./home_assistant/meshcore_location.zip)
+- Integrations-Quellcode: [`custom_components/meshcore_location/`](./custom_components/meshcore_location)
+- Bedienung: [`home_assistant/meshcore_location/README.md`](./home_assistant/meshcore_location/README.md)
+- Kurzanleitung: [`docs/home-assistant-meshcore-location.md`](./docs/home-assistant-meshcore-location.md)
+
+Das Repository kann nach dem Merge auch in HACS als benutzerdefiniertes
+Repository vom Typ **Integration** hinzugefuegt werden.
+
 ---
 
 ## About MeshCore

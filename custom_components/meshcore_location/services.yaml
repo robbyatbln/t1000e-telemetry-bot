@@ -1,0 +1,27 @@
+send_command:
+  name: Firmware-Befehl senden
+  description: Sendet einen freien Tracker-Befehl per konfiguriertem Channel oder als Direktnachricht.
+  fields:
+    entry_id:
+      name: MeshCore Location Eintrag
+      description: Die Entry-ID der eingerichteten MeshCore-Location-Zuordnung.
+      required: true
+      selector:
+        text:
+    route:
+      name: Versandweg
+      required: true
+      default: channel
+      selector:
+        select:
+          options:
+            - label: Channel
+              value: channel
+            - label: Direktnachricht
+              value: direct
+    command:
+      name: Befehl
+      description: Ohne fuehrendes "config", z. B. "interval 60" oder "wecker 07:30".
+      required: true
+      selector:
+        text:
