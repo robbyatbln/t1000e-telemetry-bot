@@ -1,9 +1,9 @@
 # Changelog
 
-## home-assistant-meshcore-location-v0.3.1
+## home-assistant-meshcore-location-v0.3.2
 
-- Fuegt eine installierbare Home-Assistant-Custom-Integration unter
-  `home_assistant/meshcore_location/` hinzu.
+- Fuegt eine installierbare, HACS-kompatible Home-Assistant-Custom-Integration
+  unter `custom_components/meshcore_location/` hinzu.
 - Liest konfigurierte MeshCore-Channels aus der vorhandenen Integration und
   erkennt beliebige Teilnehmer aus GPS-Meldungen im Aktivitaetsverlauf.
 - Erstellt Karten-Tracker sowie Channel-/Direct-Buttons fuer die

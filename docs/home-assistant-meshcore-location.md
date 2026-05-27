@@ -14,6 +14,22 @@ Die zu installierende Datei lautet:
 meshcore_location.zip
 ```
 
+## Installation mit HACS
+
+Nach dem Merge des Home-Assistant-Integrationsbranches:
+
+1. In HACS oben rechts das Menue oeffnen und **Benutzerdefinierte
+   Repositories** auswaehlen.
+2. Diese Repository-URL eintragen:
+
+   ```text
+   https://github.com/robbyatbln/t1000e-telemetry-bot
+   ```
+
+3. Als Kategorie **Integration** auswaehlen und hinzufuegen.
+4. **MeshCore Location** in HACS installieren.
+5. Home Assistant neu starten.
+
 ## Installation per Home-Assistant-SSH
 
 1. `meshcore_location.zip` nach `/config/` auf Home Assistant uebertragen.
@@ -48,7 +64,7 @@ Falls noch kein Teilnehmer erkannt wird, vor Schritt 3 oder 4 eine neue
 GPS-Nachricht dieses Teilnehmers in den Channel senden. Alternativ kann der
 Teilnehmername von Hand eingetragen werden.
 
-Die Version `0.3.1` liest die konfigurierten Channels aus der vorhandenen
+Die Version `0.3.2` liest die konfigurierten Channels aus der vorhandenen
 MeshCore-Integration und durchsucht den Aktivitaets-/Logbuchverlauf der
 automatisch zugeordneten Channel-Entity. Vorherige Versionen konnten
 faelschlich ein Icon-Attribut wie `mdi` als Teilnehmer anzeigen und lasen die

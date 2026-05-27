@@ -15,8 +15,12 @@ GPS-Tracker fuer die Karte an und stellt Buttons fuer die unterstuetzten
 Firmware-Befehle bereit.
 
 - Installations-ZIP: [`home_assistant/meshcore_location.zip`](./home_assistant/meshcore_location.zip)
-- Quellcode und Bedienung: [`home_assistant/meshcore_location/README.md`](./home_assistant/meshcore_location/README.md)
+- Integrations-Quellcode: [`custom_components/meshcore_location/`](./custom_components/meshcore_location)
+- Bedienung: [`home_assistant/meshcore_location/README.md`](./home_assistant/meshcore_location/README.md)
 - Kurzanleitung: [`docs/home-assistant-meshcore-location.md`](./docs/home-assistant-meshcore-location.md)
+
+Das Repository kann nach dem Merge auch in HACS als benutzerdefiniertes
+Repository vom Typ **Integration** hinzugefuegt werden.
 
 ---
 

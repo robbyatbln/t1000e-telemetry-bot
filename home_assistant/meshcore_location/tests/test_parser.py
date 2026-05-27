@@ -6,7 +6,7 @@ import sys
 
 
 PARSER_PATH = (
-    Path(__file__).parents[1]
+    Path(__file__).parents[3]
     / "custom_components"
     / "meshcore_location"
     / "parser.py"

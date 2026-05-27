@@ -44,6 +44,18 @@ Nach dem Entpacken muss diese Datei existieren:
 /config/custom_components/meshcore_location/manifest.json
 ```
 
+## Installation mit HACS
+
+Nach dem Merge des Integrationsbranches kann dieses Repository in HACS als
+benutzerdefiniertes Repository vom Typ **Integration** hinzugefuegt werden:
+
+```text
+https://github.com/robbyatbln/t1000e-telemetry-bot
+```
+
+HACS installiert dann automatisch den Inhalt aus
+`custom_components/meshcore_location/`.
+
 ## Einrichtung in der GUI
 
 1. **Einstellungen > Geraete & Dienste > Integration hinzufuegen** oeffnen.
