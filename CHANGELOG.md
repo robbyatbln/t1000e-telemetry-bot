@@ -1,5 +1,25 @@
 # Changelog
 
+## v9-meshcore-1.18.0 (2026-10-15)
+
+- Neue Basis: offizieller Tag `companion-v1.18.0`, Commit `81dbae592ffad40b4212bc0b37e82b38da08f4bc`.
+- Behaelt die Tracking-Funktionen aus v8: private Direct-Telemetrie, bewusster Flood in private Kanaele, Scope, mindestens 10 Minuten, Start nach dem Einschalten, Tastenversand, Wecker, Suchton und BLE-Auto-Off.
+- Passt Bluetooth und Tonfunktionen an die neuen MeshCore-Schnittstellen an; BLE-Abschalten laesst andere App-Schnittstellen unberuehrt.
+- Uebernimmt Einstellungen aus dem alten v1-v8-Binaerformat in das neue `/prefs.json`, einschliesslich Intervall, Zielkontakt, Kanal, Befehlswort, Wecker und Zeitsync.
+- Gespeicherte Intervalle werden beim Neustart nicht mehr vom 10-Minuten-Standard ueberschrieben.
+- Direkte und adressierte Kanalbefehle verwenden denselben Handler. Kanalbefehle koennen auch Wecker, Suchton, Sound und Scope steuern.
+- Kanalbefehle verstehen Absender-Praefixe, Gross-/Kleinschreibung und Geraetenamen mit Leerzeichen. `target me` wird nur per Direktnachricht akzeptiert.
+- Die interne Uhr bleibt UTC; Status zeigt jetzt auch das Datum. GPS-Zeitsync und lokale Sommerzeitumrechnung bleiben erhalten.
+- Empfangene Chat-Zeitstempel stellen die Uhr nicht mehr um: Ein Gegenueber mit falscher Uhr kann den Tracker dadurch nicht erneut Stunden/Tage verstellen. Verlaessliche Zeitquellen sind GPS und der lokale App-Zeitabgleich per BLE.
+- Status zeigt BLE und normale Tonsignale als aktive Icons. GPS-Links bleiben auch bei langen Kanal-Absendernamen vollstaendig; die optionale Zeitzeile entfaellt bei Platzmangel.
+- `config wecker aus` beendet auch einen gerade laufenden Alarm.
+- Firmwarekennung in der App: `v1.18.0-telem-v9`.
+- Firmware-Dateien:
+  - `firmware/t1000e_companion_radio_ble-telemetry-bot-v9.zip`
+  - `firmware/t1000e_companion_radio_ble-telemetry-bot-v9.uf2`
+  - `firmware/t1000e_companion_radio_ble-telemetry-bot-v9.sha256`
+- Pruefung: Host-Tests fuer Speicherung/Migration und Kanalbefehle, T1000-E-Build sowie Abgleich von ZIP/UF2 inklusive DFU-CRC, Flashadressen und Versionskennung. Ein Hardwaretest am Tracker steht noch aus.
+
 ## home-assistant-meshcore-location-v0.3.2
 
 - Fuegt eine installierbare, HACS-kompatible Home-Assistant-Custom-Integration

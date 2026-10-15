@@ -1,5 +1,24 @@
 # SenseCAP T1000-E Telemetry Bot Firmware
 
+## Update auf v9 MeshCore 1.18.0
+
+v9 verwendet den offiziellen MeshCore-Tag [companion-v1.18.0](https://github.com/meshcore-dev/MeshCore/tree/companion-v1.18.0) vom 15.10.2026. Der Tag wurde bereits gesetzt; zum Zeitpunkt der Umstellung ist die letzte veroeffentlichte Upstream-Firmware mit fertigen Downloads noch 1.17.1. Dies hier ist unser eigener T1000-E-Build auf dem neuen Tag. In der App steht `v1.18.0-telem-v9`.
+
+Alle bisherigen Tracking-Funktionen sind enthalten: Direct/Flood, private Kanaele, Scope, frei waehlbares Label und Felder, mindestens zehn Minuten, Start nach dem Einschalten, Tastenversand mit Quittungston, Wecker mit lokalem Stop, Suchton, GPS-Zeitsync und Bluetooth-Abschaltung.
+
+1. Die v9-ZIP aus `firmware/` herunterladen und im Web/nRF-Flasher als Custom Firmware auswaehlen. Die UF2 ist fuer das DFU-Laufwerk.
+2. Beim normalen Firmware-Update ohne Loeschen des Dateisystems werden Kontakte/Kanaele weiterverwendet. v9 uebernimmt die alten Telemetrie-Einstellungen aus v1-v8 in das neue `/prefs.json`.
+3. Tracker neu starten und die Firmwarekennung pruefen.
+4. Fuer korrekte Zeit einmal die App direkt per BLE verbinden und den App-Zeitabgleich ausfuehren oder `config sync` senden und draussen einen GPS-Fix abwarten. Alte Chat-Zeitstempel werden absichtlich nicht mehr als Uhrzeitquelle uebernommen.
+5. `config status` per Direct senden. Die Antwort enthaelt Datum, lokale Uhrzeit, aktive Icons, Intervall und Versandmodus.
+6. Im bereits auf beiden Geraeten eingerichteten privaten Kanal testen: `config Rob@bln_Sense_MAX status`. Den Beispielnamen durch den aktuellen Node-Namen ersetzen.
+
+Ein gespeichertes Intervall von z. B. 30 Minuten bleibt nach dem Neustart erhalten. Ein vorher gestoppter Versand bleibt gestoppt. Bei aktiviertem Versand wird die erste Meldung nach etwa drei Sekunden eingeplant; ein GPS-Fix kann laenger dauern.
+
+Der GPS-Link steht am Ende der Telemetrie. Reicht der Platz wegen eines langen Absendernamens nicht fuer alle Zeilen, entfaellt zuerst die optionale Zeitzeile.
+
+ZIP und UF2 werden vor der Veroeffentlichung gemeinsam auf DFU-Manifest/CRC, UF2-Blockstruktur, Speicheradressen und identischen Firmwareinhalt geprueft. Das ersetzt den anschliessenden Test am echten Tracker nicht.
+
 ## Deutsche Kurzbeschreibung
 
 Diese Firmware ist eine angepasste MeshCore BLE Companion Firmware fuer den Seeed Studio SenseCAP T1000-E. Sie ist fuer Leute gedacht, die MeshCore bereits nutzen und den T1000-E als einfachen Tracker einsetzen wollen, zum Beispiel fuer Kinder, Tiere, Gruppen auf Veranstaltungen, Treffen im Park oder andere Situationen, in denen man ohne Mobilfunknetz sehen moechte, wo etwas oder jemand gerade ist.
@@ -34,7 +53,7 @@ Die Firmware bleibt grundsaetzlich eine normale MeshCore Companion Firmware: Ver
 
 ## Fertige Firmware-Dateien
 
-Im Ordner `firmware/` liegen zwei Dateien:
+Im Ordner `firmware/` liegen die Firmware-Dateien aller Folgeversionen:
 
 - `t1000e_companion_radio_ble-telemetry-bot.zip` fuer den MeshCore/Web nRF Flasher.
 - `t1000e_companion_radio_ble-telemetry-bot.uf2` fuer Drag-and-Drop im DFU-Laufwerk.
@@ -52,6 +71,9 @@ Im Ordner `firmware/` liegen zwei Dateien:
 - `t1000e_companion_radio_ble-telemetry-bot-v7.uf2` als UF2-Datei dieser Folgeversion.
 - `t1000e_companion_radio_ble-telemetry-bot-v8.zip` als Folgeversion mit korrigierter Erkennung von Kanalbefehlen mit Absender-Praefix.
 - `t1000e_companion_radio_ble-telemetry-bot-v8.uf2` als UF2-Datei dieser Folgeversion.
+- `t1000e_companion_radio_ble-telemetry-bot-v9.zip` auf Basis von MeshCore 1.18.0 fuer den Web-Flasher.
+- `t1000e_companion_radio_ble-telemetry-bot-v9.uf2` fuer das DFU-Laufwerk.
+- `t1000e_companion_radio_ble-telemetry-bot-v9.sha256` mit den Pruefsummen.
 
 Wichtig: Im Web-Flasher die ZIP-Datei verwenden. Die UF2-Datei nur direkt auf das DFU-Laufwerk kopieren. Wer die bisherige Version behalten moechte, nutzt die Dateien ohne Versionssuffix; wer neue Funktionen testen moechte, nutzt die passende Folgeversion mit `-v2`, `-v3` usw.
 
@@ -61,14 +83,14 @@ Wichtig: Im Web-Flasher die ZIP-Datei verwenden. Die UF2-Datei nur direkt auf da
 
 1. T1000-E in den DFU/Bootloader-Modus bringen.
 2. MeshCore/Web-Flasher oeffnen.
-3. Als Custom Firmware die passende ZIP auswaehlen, z. B. `firmware/t1000e_companion_radio_ble-telemetry-bot-v8.zip` fuer die aktuelle Folgeversion.
+3. Als Custom Firmware die passende ZIP auswaehlen, z. B. `firmware/t1000e_companion_radio_ble-telemetry-bot-v9.zip` fuer die aktuelle Folgeversion.
 4. Flashen und den Neustart abwarten.
 
 ### Variante B: UF2 per Drag-and-Drop
 
 1. T1000-E in den DFU/Bootloader-Modus bringen.
 2. Warten, bis das T1000-E-Laufwerk erscheint.
-3. Die passende UF2-Datei auf dieses Laufwerk kopieren, z. B. `firmware/t1000e_companion_radio_ble-telemetry-bot-v8.uf2` fuer die aktuelle Folgeversion.
+3. Die passende UF2-Datei auf dieses Laufwerk kopieren, z. B. `firmware/t1000e_companion_radio_ble-telemetry-bot-v9.uf2` fuer die aktuelle Folgeversion.
 4. Neustart abwarten.
 
 ## Standardverhalten
@@ -85,6 +107,28 @@ Im aktuellen Build sind diese Defaults gesetzt:
 Der automatische Versand geht zuerst privat per Direct. Ein Gruppen-/Flood-Versand passiert nur nach `config flood`. Der Kanal `Public` wird fuer Tracking nicht verwendet.
 Wenn Telemetrie aktiviert ist, sendet v4 nach dem Einschalten automatisch nach wenigen Sekunden die erste Meldung. Danach laeuft wieder das eingestellte Intervall.
 Der konfigurierte private Kanal wird in v7 auch fuer gezielte Befehle ueberwacht. Beispiel: `config Rob@bln_Sense_MAX status`. Ab v8 werden dabei auch MeshCore-Gruppentexte mit Absender-Praefix erkannt, z. B. `Rob@bln_Bot: config Rob@bln_Sense_MAX status`.
+
+## Befehle im privaten Kanal
+
+Der Tracker muss den Kanal, z. B. `Robbys_channel`, bereits mit demselben Schluessel wie der Sender eingerichtet haben. `config group Robbys_channel` waehlt den gespeicherten Kanal aus; es legt keinen Kanal samt Schluessel an. `Public` wird abgelehnt.
+
+Im Kanal wird jeder Befehl mit dem Node-Namen adressiert:
+
+```text
+config Rob@bln_Sense_MAX status
+config Rob@bln_Sense_MAX start
+config Rob@bln_Sense_MAX gps akku temp licht
+config Rob@bln_Sense_MAX ble on
+config Rob@bln_Sense_MAX wecker 15:44
+config Rob@bln_Sense_MAX wo ist 3
+config Rob@bln_Sense_MAX stop
+```
+
+Die Quittung geht in denselben Kanal. Auch Geraetenamen mit Leerzeichen funktionieren. Gross-/Kleinschreibung des adressierten Geraetenamens ist egal. Bei einem geaenderten Befehlswort wird `config` entsprechend ersetzt.
+
+Direct und Kanal verwenden ab v9 denselben Handler. Eine Ausnahme ist `target me`: Diesen Befehl direkt an den Tracker senden, damit dessen Direct-Ziel anhand des Kontaktschluessels eindeutig gesetzt wird. Ein `start` im Kanal verwendet das bereits gespeicherte Ziel und den bisherigen Versandmodus.
+
+Alle Teilnehmer mit dem privaten Kanalschluessel koennen die adressierten Befehle senden.
 
 ## Befehle per Direktnachricht
 
@@ -117,7 +161,7 @@ Alle Befehle werden als Direktnachricht an den T1000-E gesendet. Jeder erkannte 
 | `wecker 15:44` | Setzt einen lokalen Wecker auf 15:44 Uhr. Funktioniert auch ohne `config`. |
 | `config wecker 15:44` | Setzt den Wecker ebenfalls auf 15:44 Uhr. |
 | `config wecker aus` | Deaktiviert den Wecker. |
-| `sync` | Korrigiert die Uhr anhand des App-Nachrichtenzeitstempels und startet GPS-Zeitsync. |
+| `sync` | Fordert eine neue GPS-Zeit an; nach dem Fix wird die UTC-Uhr korrigiert. |
 | `time sync` | Alias fuer `sync`. |
 | `config sync` | Alias fuer `sync`. |
 | `config timesync einmal` | Fordert einmalig einen GPS-Zeitabgleich an. GPS wird dafuer eingeschaltet. |
@@ -132,7 +176,9 @@ Ein kurzer Tastendruck am T1000-E sendet sofort eine Telemetrie-Nachricht mit de
 Bei erfolgreichem Versand spielt v3 einen kurzen Quittungston, der anders klingt als Wecker und Suchton.
 Wenn der Wecker klingelt, stoppt ein kurzer Tastendruck den Alarm lokal.
 
-Die interne Tracker-Uhr laeuft ab v7 konsequent in UTC. Fuer Status, Wecker und Telemetrie wird daraus die lokale Zeit berechnet. In Europa nutzt die Firmware CET/CEST, im Sommer also fuer Deutschland/Berlin `UTC+2`. Dadurch wird verhindert, dass bei wiederholtem Sync jedes Mal erneut zwei Stunden aufaddiert werden.
+Die interne Tracker-Uhr laeuft konsequent in UTC. Fuer Status, Wecker und Telemetrie wird daraus die lokale Zeit berechnet. Im bisherigen Europa-Bereich nutzt die Firmware CET/CEST, also fuer Deutschland im Sommer `UTC+2` und im Winter `UTC+1`. Das ist keine weltweite Zeitzonendatenbank: Ausserhalb dieses Bereichs wird der Versatz weiterhin grob aus dem Laengengrad geschaetzt.
+
+Ab v9 werden Chat-Zeitstempel anderer Nodes nicht mehr als Uhrzeitquelle uebernommen. Eine falsche Uhr am sendenden Node kann den Tracker deshalb nicht wieder verstellen. GPS und der lokale App-Zeitsync per BLE schreiben UTC, die lokale Anzeige rechnet den Versatz genau einmal hinzu.
 
 Nach `config prefix xy` muessen weitere Befehle mit `xy` beginnen:
 
@@ -217,6 +263,14 @@ UF2 erzeugen:
 python bin\uf2conv\uf2conv.py .pio\build\t1000e_companion_radio_ble\firmware.hex -c -o .pio\build\t1000e_companion_radio_ble\firmware.uf2 -f 0xADA52840
 ```
 
+Vor der Veroeffentlichung die zusammengehoerenden Dateien kontrollieren:
+
+```powershell
+python bin/verify-telemetry-firmware.py firmware/t1000e_companion_radio_ble-telemetry-bot-v9 --write-checksums
+```
+
+Die Tests fuer Speicherung, Migration und Kanalbefehle liegen in `test/test_companion_node_prefs/` und laufen mit der bestehenden nativen PlatformIO-Testumgebung (`python -m platformio test -e native -f test_companion_node_prefs`). Dafuer ist ein Host-C++-Compiler erforderlich.
+
 ## Geaenderte Bereiche
 
 - `examples/companion_radio/MyMesh.cpp`
@@ -239,6 +293,10 @@ python bin\uf2conv\uf2conv.py .pio\build\t1000e_companion_radio_ble\firmware.hex
 ---
 
 ## English Summary
+
+Current custom release: **v9 on official source tag companion-v1.18.0**, device version `v1.18.0-telem-v9`. Tracking features from v8 are preserved and adapted to the new configuration, UI and interface APIs. Existing v1-v8 binary preferences migrate to the new configuration file. The saved interval survives reboot.
+
+Direct and addressed private-channel commands share one handler. Replies go back to the originating channel. Set a direct recipient with `config target me` in a direct message first. Only GPS and the locally connected app set the UTC clock; peer chat timestamps no longer change it.
 
 This fork adds a telemetry bot mode to the MeshCore BLE companion firmware for the Seeed Studio SenseCAP T1000-E.
 
@@ -284,14 +342,14 @@ Use the ZIP with web flashing. Use the UF2 only when the T1000-E appears as a DF
 
 1. Put the T1000-E into DFU/bootloader mode.
 2. Open the MeshCore flasher.
-3. Choose the custom firmware ZIP from `firmware/t1000e_companion_radio_ble-telemetry-bot-v7.zip`.
+3. Choose the custom firmware ZIP from `firmware/t1000e_companion_radio_ble-telemetry-bot-v9.zip`.
 4. Flash and wait until the device reboots.
 
 ### Option B: UF2 Drag-and-Drop
 
 1. Put the T1000-E into DFU/bootloader mode.
 2. Wait until the T1000-E DFU drive appears.
-3. Copy `firmware/t1000e_companion_radio_ble-telemetry-bot-v7.uf2` onto that drive.
+3. Copy `firmware/t1000e_companion_radio_ble-telemetry-bot-v9.uf2` onto that drive.
 4. Wait for the device to reboot.
 
 ## Default Behavior
@@ -338,7 +396,7 @@ Send these as direct messages to the T1000-E node.
 | `config wo ist 3` | Plays the find-device sound 3 times. Valid range is 1 to 10. |
 | `wecker 15:44` | Sets a local alarm for 15:44. Works without the `config` prefix. |
 | `config wecker aus` | Disables the alarm. |
-| `sync` | Corrects the clock from the app message timestamp and starts GPS time sync. |
+| `sync` | Requests a fresh GPS fix to set the UTC clock. |
 | `time sync` | Alias for `sync`. |
 | `config sync` | Alias for `sync`. |
 | `config timesync einmal` | Requests a one-shot GPS time sync. |
