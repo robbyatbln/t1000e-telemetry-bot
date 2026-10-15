@@ -21,7 +21,7 @@
       
       
       <link rel="icon" href="../assets/images/favicon.png">
-      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.6">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.7">
     
     
       
@@ -29,7 +29,7 @@
       
     
     
-      <link rel="stylesheet" href="../assets/stylesheets/main.484c7ddc.min.css">
+      <link rel="stylesheet" href="../assets/stylesheets/main.ec1eaa64.min.css">
       
       
 
@@ -548,6 +548,33 @@
   
   
     <li class="md-nav__item">
+      <a href="../radio_presets/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Radio Presets
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
       <a href="../stats_binary_frames/" class="md-nav__link">
         
   
@@ -692,12 +719,17 @@
 <pre><code>set lon {longitude}
 </code></pre>
 <p>Sets your advertisement map longitude. (decimal degrees)</p>
-<pre><code>set dutycycle {percent}
-</code></pre>
-<p>Sets the transmit duty cycle limit (1-100%). Example: <code>set dutycycle 10</code> for 10%.</p>
 <pre><code>set af {air-time-factor}
 </code></pre>
-<p>Sets the transmit air-time-factor. Deprecated — use <code>set dutycycle</code> instead.</p>
+<p>Sets the transmit air-time-factor.</p>
+<blockquote>
+<p><strong>Note:</strong> <code>set dutycycle</code> is <em>not</em> available in Terminal Chat. Every other
+firmware — Repeater, Room Server, Sensor and Companion Radio — routes its
+<code>set</code>/<code>get</code> commands through the shared radio prefs handler and does support
+it (see <a href="../cli_commands/">CLI Commands</a>). Terminal Chat is the sole
+exception: it has its own inline <code>set</code> handler covering only the six options
+listed above.</p>
+</blockquote>
 <pre><code>time {epoch-secs}
 </code></pre>
 <p>Set the device clock using UNIX epoch seconds. Example:  time 1738242833</p>
@@ -712,7 +744,7 @@
 <p>Shows the device version and firmware build date.</p>
 <pre><code>card
 </code></pre>
-<p>Displays <em>your</em> 'business card', for other to manually <em>import</em></p>
+<p>Displays <em>your</em> 'business card', for others to manually <em>import</em></p>
 <pre><code>import {card}
 </code></pre>
 <p>Imports the given card to your contacts.</p>
@@ -734,6 +766,9 @@
 <pre><code>public {text}
 </code></pre>
 <p>Sends the text message to the built-in 'public' group channel</p>
+<pre><code>help
+</code></pre>
+<p>Lists the available commands.</p>
 
 
 
@@ -786,7 +821,7 @@
       <script id="__config" type="application/json">{"annotate": null, "base": "..", "features": ["content.action.edit", "content.code.copy", "search.highlight", "search.suggest"], "search": "../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": null}</script>
     
     
-      <script src="../assets/javascripts/bundle.79ae519e.min.js"></script>
+      <script src="../assets/javascripts/bundle.d7400e89.min.js"></script>
       
     
   </body>

@@ -23,7 +23,7 @@
       
       
       <link rel="icon" href="../assets/images/favicon.png">
-      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.6">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.7">
     
     
       
@@ -31,7 +31,7 @@
       
     
     
-      <link rel="stylesheet" href="../assets/stylesheets/main.484c7ddc.min.css">
+      <link rel="stylesheet" href="../assets/stylesheets/main.ec1eaa64.min.css">
       
       
 
@@ -550,6 +550,33 @@
   
   
     <li class="md-nav__item">
+      <a href="../radio_presets/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Radio Presets
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
       <a href="../stats_binary_frames/" class="md-nav__link">
         
   
@@ -635,6 +662,17 @@
       Table of contents
     </label>
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#update-auf-v9-meshcore-1180" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Update auf v9 MeshCore 1.18.0
+      
+    </span>
+  </a>
+  
+</li>
       
         <li class="md-nav__item">
   <a href="#deutsche-kurzbeschreibung" class="md-nav__link">
@@ -724,6 +762,17 @@
     <span class="md-ellipsis">
       
         Standardverhalten
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#befehle-im-privaten-kanal" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Befehle im privaten Kanal
       
     </span>
   </a>
@@ -985,6 +1034,17 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
+  <a href="#update-auf-v9-meshcore-1180" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Update auf v9 MeshCore 1.18.0
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#deutsche-kurzbeschreibung" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -1072,6 +1132,17 @@
     <span class="md-ellipsis">
       
         Standardverhalten
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#befehle-im-privaten-kanal" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Befehle im privaten Kanal
       
     </span>
   </a>
@@ -1297,6 +1368,20 @@
 
 
 <h1 id="sensecap-t1000-e-telemetry-bot-firmware">SenseCAP T1000-E Telemetry Bot Firmware</h1>
+<h2 id="update-auf-v9-meshcore-1180">Update auf v9 MeshCore 1.18.0</h2>
+<p>v9 verwendet den offiziellen MeshCore-Tag <a href="https://github.com/meshcore-dev/MeshCore/tree/companion-v1.18.0">companion-v1.18.0</a> vom 15.10.2026. Der Tag wurde bereits gesetzt; zum Zeitpunkt der Umstellung ist die letzte veroeffentlichte Upstream-Firmware mit fertigen Downloads noch 1.17.1. Dies hier ist unser eigener T1000-E-Build auf dem neuen Tag. In der App steht <code>v1.18.0-telem-v9</code>.</p>
+<p>Alle bisherigen Tracking-Funktionen sind enthalten: Direct/Flood, private Kanaele, Scope, frei waehlbares Label und Felder, mindestens zehn Minuten, Start nach dem Einschalten, Tastenversand mit Quittungston, Wecker mit lokalem Stop, Suchton, GPS-Zeitsync und Bluetooth-Abschaltung.</p>
+<ol>
+<li>Die v9-ZIP aus <code>firmware/</code> herunterladen und im Web/nRF-Flasher als Custom Firmware auswaehlen. Die UF2 ist fuer das DFU-Laufwerk.</li>
+<li>Beim normalen Firmware-Update ohne Loeschen des Dateisystems werden Kontakte/Kanaele weiterverwendet. v9 uebernimmt die alten Telemetrie-Einstellungen aus v1-v8 in das neue <code>/prefs.json</code>.</li>
+<li>Tracker neu starten und die Firmwarekennung pruefen.</li>
+<li>Fuer korrekte Zeit einmal die App direkt per BLE verbinden und den App-Zeitabgleich ausfuehren oder <code>config sync</code> senden und draussen einen GPS-Fix abwarten. Alte Chat-Zeitstempel werden absichtlich nicht mehr als Uhrzeitquelle uebernommen.</li>
+<li><code>config status</code> per Direct senden. Die Antwort enthaelt Datum, lokale Uhrzeit, aktive Icons, Intervall und Versandmodus.</li>
+<li>Im bereits auf beiden Geraeten eingerichteten privaten Kanal testen: <code>config Rob@bln_Sense_MAX status</code>. Den Beispielnamen durch den aktuellen Node-Namen ersetzen.</li>
+</ol>
+<p>Ein gespeichertes Intervall von z. B. 30 Minuten bleibt nach dem Neustart erhalten. Ein vorher gestoppter Versand bleibt gestoppt. Bei aktiviertem Versand wird die erste Meldung nach etwa drei Sekunden eingeplant; ein GPS-Fix kann laenger dauern.</p>
+<p>Der GPS-Link steht am Ende der Telemetrie. Reicht der Platz wegen eines langen Absendernamens nicht fuer alle Zeilen, entfaellt zuerst die optionale Zeitzeile.</p>
+<p>ZIP und UF2 werden vor der Veroeffentlichung gemeinsam auf DFU-Manifest/CRC, UF2-Blockstruktur, Speicheradressen und identischen Firmwareinhalt geprueft. Das ersetzt den anschliessenden Test am echten Tracker nicht.</p>
 <h2 id="deutsche-kurzbeschreibung">Deutsche Kurzbeschreibung</h2>
 <p>Diese Firmware ist eine angepasste MeshCore BLE Companion Firmware fuer den Seeed Studio SenseCAP T1000-E. Sie ist fuer Leute gedacht, die MeshCore bereits nutzen und den T1000-E als einfachen Tracker einsetzen wollen, zum Beispiel fuer Kinder, Tiere, Gruppen auf Veranstaltungen, Treffen im Park oder andere Situationen, in denen man ohne Mobilfunknetz sehen moechte, wo etwas oder jemand gerade ist.</p>
 <p>Die Firmware bleibt grundsaetzlich eine normale MeshCore Companion Firmware: Verbindung per Android/iOS/Web-App, Gruppen, Kontakte, Region und normale Nachrichten funktionieren weiterhin wie gewohnt. Zusaetzlich gibt es eine Tracking-Funktion, die Akku, Position und Sensorwerte regelmaessig in eine ausgewaehlte MeshCore-Gruppe schreibt und per Direktnachricht gesteuert wird.</p>
@@ -1382,7 +1467,7 @@
 <li>Einfache Fernsteuerung ohne neue Android-App und ohne Custom-Var-Menue.</li>
 </ul>
 <h2 id="fertige-firmware-dateien">Fertige Firmware-Dateien</h2>
-<p>Im Ordner <code>firmware/</code> liegen zwei Dateien:</p>
+<p>Im Ordner <code>firmware/</code> liegen die Firmware-Dateien aller Folgeversionen:</p>
 <ul>
 <li><code>t1000e_companion_radio_ble-telemetry-bot.zip</code> fuer den MeshCore/Web nRF Flasher.</li>
 <li><code>t1000e_companion_radio_ble-telemetry-bot.uf2</code> fuer Drag-and-Drop im DFU-Laufwerk.</li>
@@ -1400,6 +1485,9 @@
 <li><code>t1000e_companion_radio_ble-telemetry-bot-v7.uf2</code> als UF2-Datei dieser Folgeversion.</li>
 <li><code>t1000e_companion_radio_ble-telemetry-bot-v8.zip</code> als Folgeversion mit korrigierter Erkennung von Kanalbefehlen mit Absender-Praefix.</li>
 <li><code>t1000e_companion_radio_ble-telemetry-bot-v8.uf2</code> als UF2-Datei dieser Folgeversion.</li>
+<li><code>t1000e_companion_radio_ble-telemetry-bot-v9.zip</code> auf Basis von MeshCore 1.18.0 fuer den Web-Flasher.</li>
+<li><code>t1000e_companion_radio_ble-telemetry-bot-v9.uf2</code> fuer das DFU-Laufwerk.</li>
+<li><code>t1000e_companion_radio_ble-telemetry-bot-v9.sha256</code> mit den Pruefsummen.</li>
 </ul>
 <p>Wichtig: Im Web-Flasher die ZIP-Datei verwenden. Die UF2-Datei nur direkt auf das DFU-Laufwerk kopieren. Wer die bisherige Version behalten moechte, nutzt die Dateien ohne Versionssuffix; wer neue Funktionen testen moechte, nutzt die passende Folgeversion mit <code>-v2</code>, <code>-v3</code> usw.</p>
 <h2 id="flashen">Flashen</h2>
@@ -1407,14 +1495,14 @@
 <ol>
 <li>T1000-E in den DFU/Bootloader-Modus bringen.</li>
 <li>MeshCore/Web-Flasher oeffnen.</li>
-<li>Als Custom Firmware die passende ZIP auswaehlen, z. B. <code>firmware/t1000e_companion_radio_ble-telemetry-bot-v8.zip</code> fuer die aktuelle Folgeversion.</li>
+<li>Als Custom Firmware die passende ZIP auswaehlen, z. B. <code>firmware/t1000e_companion_radio_ble-telemetry-bot-v9.zip</code> fuer die aktuelle Folgeversion.</li>
 <li>Flashen und den Neustart abwarten.</li>
 </ol>
 <h3 id="variante-b-uf2-per-drag-and-drop">Variante B: UF2 per Drag-and-Drop</h3>
 <ol>
 <li>T1000-E in den DFU/Bootloader-Modus bringen.</li>
 <li>Warten, bis das T1000-E-Laufwerk erscheint.</li>
-<li>Die passende UF2-Datei auf dieses Laufwerk kopieren, z. B. <code>firmware/t1000e_companion_radio_ble-telemetry-bot-v8.uf2</code> fuer die aktuelle Folgeversion.</li>
+<li>Die passende UF2-Datei auf dieses Laufwerk kopieren, z. B. <code>firmware/t1000e_companion_radio_ble-telemetry-bot-v9.uf2</code> fuer die aktuelle Folgeversion.</li>
 <li>Neustart abwarten.</li>
 </ol>
 <h2 id="standardverhalten">Standardverhalten</h2>
@@ -1430,6 +1518,20 @@
 <p>Der automatische Versand geht zuerst privat per Direct. Ein Gruppen-/Flood-Versand passiert nur nach <code>config flood</code>. Der Kanal <code>Public</code> wird fuer Tracking nicht verwendet.
 Wenn Telemetrie aktiviert ist, sendet v4 nach dem Einschalten automatisch nach wenigen Sekunden die erste Meldung. Danach laeuft wieder das eingestellte Intervall.
 Der konfigurierte private Kanal wird in v7 auch fuer gezielte Befehle ueberwacht. Beispiel: <code>config Rob@bln_Sense_MAX status</code>. Ab v8 werden dabei auch MeshCore-Gruppentexte mit Absender-Praefix erkannt, z. B. <code>Rob@bln_Bot: config Rob@bln_Sense_MAX status</code>.</p>
+<h2 id="befehle-im-privaten-kanal">Befehle im privaten Kanal</h2>
+<p>Der Tracker muss den Kanal, z. B. <code>Robbys_channel</code>, bereits mit demselben Schluessel wie der Sender eingerichtet haben. <code>config group Robbys_channel</code> waehlt den gespeicherten Kanal aus; es legt keinen Kanal samt Schluessel an. <code>Public</code> wird abgelehnt.</p>
+<p>Im Kanal wird jeder Befehl mit dem Node-Namen adressiert:</p>
+<pre><code class="language-text">config Rob@bln_Sense_MAX status
+config Rob@bln_Sense_MAX start
+config Rob@bln_Sense_MAX gps akku temp licht
+config Rob@bln_Sense_MAX ble on
+config Rob@bln_Sense_MAX wecker 15:44
+config Rob@bln_Sense_MAX wo ist 3
+config Rob@bln_Sense_MAX stop
+</code></pre>
+<p>Die Quittung geht in denselben Kanal. Auch Geraetenamen mit Leerzeichen funktionieren. Gross-/Kleinschreibung des adressierten Geraetenamens ist egal. Bei einem geaenderten Befehlswort wird <code>config</code> entsprechend ersetzt.</p>
+<p>Direct und Kanal verwenden ab v9 denselben Handler. Eine Ausnahme ist <code>target me</code>: Diesen Befehl direkt an den Tracker senden, damit dessen Direct-Ziel anhand des Kontaktschluessels eindeutig gesetzt wird. Ein <code>start</code> im Kanal verwendet das bereits gespeicherte Ziel und den bisherigen Versandmodus.</p>
+<p>Alle Teilnehmer mit dem privaten Kanalschluessel koennen die adressierten Befehle senden.</p>
 <h2 id="befehle-per-direktnachricht">Befehle per Direktnachricht</h2>
 <p>Alle Befehle werden als Direktnachricht an den T1000-E gesendet. Jeder erkannte Befehl wird ebenfalls per Direktnachricht bestaetigt.</p>
 <table>
@@ -1542,7 +1644,7 @@ Der konfigurierte private Kanal wird in v7 auch fuer gezielte Befehle ueberwacht
 </tr>
 <tr>
 <td><code>sync</code></td>
-<td>Korrigiert die Uhr anhand des App-Nachrichtenzeitstempels und startet GPS-Zeitsync.</td>
+<td>Fordert eine neue GPS-Zeit an; nach dem Fix wird die UTC-Uhr korrigiert.</td>
 </tr>
 <tr>
 <td><code>time sync</code></td>
@@ -1585,7 +1687,8 @@ Der konfigurierte private Kanal wird in v7 auch fuer gezielte Befehle ueberwacht
 <p>Ein kurzer Tastendruck am T1000-E sendet sofort eine Telemetrie-Nachricht mit der aktuellen Konfiguration. Im Direct-Modus geht sie an das konfigurierte Direct-Ziel, im Flood-Modus in den gesetzten privaten Kanal.
 Bei erfolgreichem Versand spielt v3 einen kurzen Quittungston, der anders klingt als Wecker und Suchton.
 Wenn der Wecker klingelt, stoppt ein kurzer Tastendruck den Alarm lokal.</p>
-<p>Die interne Tracker-Uhr laeuft ab v7 konsequent in UTC. Fuer Status, Wecker und Telemetrie wird daraus die lokale Zeit berechnet. In Europa nutzt die Firmware CET/CEST, im Sommer also fuer Deutschland/Berlin <code>UTC+2</code>. Dadurch wird verhindert, dass bei wiederholtem Sync jedes Mal erneut zwei Stunden aufaddiert werden.</p>
+<p>Die interne Tracker-Uhr laeuft konsequent in UTC. Fuer Status, Wecker und Telemetrie wird daraus die lokale Zeit berechnet. Im bisherigen Europa-Bereich nutzt die Firmware CET/CEST, also fuer Deutschland im Sommer <code>UTC+2</code> und im Winter <code>UTC+1</code>. Das ist keine weltweite Zeitzonendatenbank: Ausserhalb dieses Bereichs wird der Versatz weiterhin grob aus dem Laengengrad geschaetzt.</p>
+<p>Ab v9 werden Chat-Zeitstempel anderer Nodes nicht mehr als Uhrzeitquelle uebernommen. Eine falsche Uhr am sendenden Node kann den Tracker deshalb nicht wieder verstellen. GPS und der lokale App-Zeitsync per BLE schreiben UTC, die lokale Anzeige rechnet den Versatz genau einmal hinzu.</p>
 <p>Nach <code>config prefix xy</code> muessen weitere Befehle mit <code>xy</code> beginnen:</p>
 <pre><code class="language-text">xy help
 xy status
@@ -1637,6 +1740,10 @@ python -m platformio run -e t1000e_companion_radio_ble
 <p>UF2 erzeugen:</p>
 <pre><code class="language-powershell">python bin\uf2conv\uf2conv.py .pio\build\t1000e_companion_radio_ble\firmware.hex -c -o .pio\build\t1000e_companion_radio_ble\firmware.uf2 -f 0xADA52840
 </code></pre>
+<p>Vor der Veroeffentlichung die zusammengehoerenden Dateien kontrollieren:</p>
+<pre><code class="language-powershell">python bin/verify-telemetry-firmware.py firmware/t1000e_companion_radio_ble-telemetry-bot-v9 --write-checksums
+</code></pre>
+<p>Die Tests fuer Speicherung, Migration und Kanalbefehle liegen in <code>test/test_companion_node_prefs/</code> und laufen mit der bestehenden nativen PlatformIO-Testumgebung (<code>python -m platformio test -e native -f test_companion_node_prefs</code>). Dafuer ist ein Host-C++-Compiler erforderlich.</p>
 <h2 id="geaenderte-bereiche">Geaenderte Bereiche</h2>
 <ul>
 <li><code>examples/companion_radio/MyMesh.cpp</code></li>
@@ -1658,6 +1765,8 @@ python -m platformio run -e t1000e_companion_radio_ble
 </ul>
 <hr />
 <h2 id="english-summary">English Summary</h2>
+<p>Current custom release: <strong>v9 on official source tag companion-v1.18.0</strong>, device version <code>v1.18.0-telem-v9</code>. Tracking features from v8 are preserved and adapted to the new configuration, UI and interface APIs. Existing v1-v8 binary preferences migrate to the new configuration file. The saved interval survives reboot.</p>
+<p>Direct and addressed private-channel commands share one handler. Replies go back to the originating channel. Set a direct recipient with <code>config target me</code> in a direct message first. Only GPS and the locally connected app set the UTC clock; peer chat timestamps no longer change it.</p>
 <p>This fork adds a telemetry bot mode to the MeshCore BLE companion firmware for the Seeed Studio SenseCAP T1000-E.</p>
 <p>The firmware periodically sends selected telemetry fields by private direct message by default. Flood/group delivery is only used when explicitly enabled.</p>
 <h2 id="features">Features</h2>
@@ -1697,14 +1806,14 @@ python -m platformio run -e t1000e_companion_radio_ble
 <ol>
 <li>Put the T1000-E into DFU/bootloader mode.</li>
 <li>Open the MeshCore flasher.</li>
-<li>Choose the custom firmware ZIP from <code>firmware/t1000e_companion_radio_ble-telemetry-bot-v7.zip</code>.</li>
+<li>Choose the custom firmware ZIP from <code>firmware/t1000e_companion_radio_ble-telemetry-bot-v9.zip</code>.</li>
 <li>Flash and wait until the device reboots.</li>
 </ol>
 <h3 id="option-b-uf2-drag-and-drop">Option B: UF2 Drag-and-Drop</h3>
 <ol>
 <li>Put the T1000-E into DFU/bootloader mode.</li>
 <li>Wait until the T1000-E DFU drive appears.</li>
-<li>Copy <code>firmware/t1000e_companion_radio_ble-telemetry-bot-v7.uf2</code> onto that drive.</li>
+<li>Copy <code>firmware/t1000e_companion_radio_ble-telemetry-bot-v9.uf2</code> onto that drive.</li>
 <li>Wait for the device to reboot.</li>
 </ol>
 <h2 id="default-behavior">Default Behavior</h2>
@@ -1827,7 +1936,7 @@ When telemetry is enabled, v4 sends the first message automatically a few second
 </tr>
 <tr>
 <td><code>sync</code></td>
-<td>Corrects the clock from the app message timestamp and starts GPS time sync.</td>
+<td>Requests a fresh GPS fix to set the UTC clock.</td>
 </tr>
 <tr>
 <td><code>time sync</code></td>
@@ -1963,7 +2072,7 @@ python -m platformio run -e t1000e_companion_radio_ble
       <script id="__config" type="application/json">{"annotate": null, "base": "..", "features": ["content.action.edit", "content.code.copy", "search.highlight", "search.suggest"], "search": "../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": null}</script>
     
     
-      <script src="../assets/javascripts/bundle.79ae519e.min.js"></script>
+      <script src="../assets/javascripts/bundle.d7400e89.min.js"></script>
       
     
   </body>
